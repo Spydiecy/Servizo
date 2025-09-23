@@ -154,7 +154,7 @@ function fillDemoAdmin() {
 }
 
 // Form submission
-document.getElementById('loginForm').addEventListener('submit', function(e) {
+document.getElementById('loginForm').addEventListener('submit', async function(e) {
     e.preventDefault();
     
     // Show loading state
@@ -163,14 +163,35 @@ document.getElementById('loginForm').addEventListener('submit', function(e) {
     submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Signing In...';
     submitBtn.disabled = true;
     
-    // Simulate API call
-    setTimeout(() => {
+    try {
+        const formData = {
+            email: document.getElementById('email').value,
+            password: document.getElementById('password').value
+        };
+        
+        const response = await fetch('/auth/login', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(formData)
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            // Redirect to dashboard
+            window.location.href = '/dashboard';
+        } else {
+            alert(data.message || 'Login failed');
+        }
+    } catch (error) {
+        console.error('Login error:', error);
+        alert('Network error. Please try again.');
+    } finally {
         // Reset button
         submitBtn.innerHTML = originalText;
         submitBtn.disabled = false;
-        
-        // Show success message
-        alert('Login functionality will be implemented in backend!');
-    }, 2000);
+    }
 });
 </script>

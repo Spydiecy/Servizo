@@ -1,78 +1,114 @@
 const express = require('express');
 const path = require('path');
+const session = require('express-session');
+const MongoStore = require('connect-mongo');
+const connectDB = require('./config/database');
+const { addUserToLocals, isAuthenticated } = require('./middleware/auth');
+require('dotenv').config();
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Set view engine
-app.set('view engine', 'ejs');
-app.set('views', path.join(__dirname, '../views'));
+// Initialize database connection
+const initializeApp = async () => {
+    try {
+        // Connect to MongoDB
+        await connectDB();
+        
+        // Set view engine
+        app.set('view engine', 'ejs');
+        app.set('views', path.join(__dirname, '../views'));
 
-// Static files
-app.use(express.static(path.join(__dirname, '../public')));
+        // Middleware
+        app.use(express.static(path.join(__dirname, '../public')));
+        app.use(express.json());
+        app.use(express.urlencoded({ extended: true }));
 
-// Mock data for development
-const mockUser = null; // Set to user object when logged in
+        // Session configuration
+        app.use(session({
+            secret: process.env.SESSION_SECRET || 'your-secret-key',
+            resave: false,
+            saveUninitialized: false,
+            store: MongoStore.create({
+                mongoUrl: process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/servizo'
+            }),
+            cookie: {
+                secure: false, // Set to true in production with HTTPS
+                httpOnly: true,
+                maxAge: 24 * 60 * 60 * 1000 // 24 hours
+            }
+        }));
 
-// Routes
-app.get('/', (req, res) => {
-    res.render('layouts/main', {
-        title: 'Home',
-        user: mockUser,
-        page: 'index'
-    });
-});
+        // Add user to all templates
+        app.use(addUserToLocals);
 
-app.get('/auth/login', (req, res) => {
-    res.render('layouts/main', {
-        title: 'Login',
-        user: mockUser,
-        page: 'auth/login'
-    });
-});
+        // Routes
+        app.use('/auth', require('./routes/auth'));
 
-app.get('/auth/register', (req, res) => {
-    res.render('layouts/main', {
-        title: 'Register',
-        user: mockUser,
-        page: 'auth/register'
-    });
-});
+        // Homepage
+        app.get('/', (req, res) => {
+            res.render('layouts/main', {
+                title: 'Home',
+                page: 'index'
+            });
+        });
 
-// Mock routes for testing
-app.get('/services', (req, res) => {
-    res.json({ message: 'Services page - Coming soon!' });
-});
+        // Dashboard (protected route)
+        app.get('/dashboard', isAuthenticated, (req, res) => {
+            res.render('layouts/main', {
+                title: 'Dashboard',
+                page: 'dashboard'
+            });
+        });
 
-app.get('/about', (req, res) => {
-    res.json({ message: 'About page - Coming soon!' });
-});
+        // Mock routes for testing
+        app.get('/services', (req, res) => {
+            res.json({ message: 'Services page - Coming soon!' });
+        });
 
-app.get('/contact', (req, res) => {
-    res.json({ message: 'Contact page - Coming soon!' });
-});
+        app.get('/about', (req, res) => {
+            res.json({ message: 'About page - Coming soon!' });
+        });
 
-app.get('/dashboard', (req, res) => {
-    res.json({ message: 'Dashboard - Coming soon!' });
-});
+        app.get('/contact', (req, res) => {
+            res.json({ message: 'Contact page - Coming soon!' });
+        });
 
-app.get('/bookings', (req, res) => {
-    res.json({ message: 'Bookings page - Coming soon!' });
-});
+        app.get('/bookings', isAuthenticated, (req, res) => {
+            res.json({ message: 'Bookings page - Coming soon!' });
+        });
 
-// Error handling
-app.use((req, res) => {
-    res.status(404).json({ message: 'Page not found' });
-});
+        app.get('/profile', isAuthenticated, (req, res) => {
+            res.json({ message: 'Profile page - Coming soon!' });
+        });
 
-app.use((err, req, res, next) => {
-    console.error(err.stack);
-    res.status(500).json({ message: 'Something went wrong!' });
-});
+        // Error handling
+        app.use((req, res) => {
+            res.status(404).json({ message: 'Page not found' });
+        });
 
-app.listen(PORT, () => {
-    console.log(`🚀 Servizo server running on http://localhost:${PORT}`);
-    console.log(`📱 Frontend ready for testing!`);
-});
+        app.use((err, req, res, next) => {
+            console.error(err.stack);
+            res.status(500).json({ message: 'Something went wrong!' });
+        });
+
+        // Start server
+        app.listen(PORT, () => {
+            console.log(`🚀 Server running on port ${PORT}`);
+            console.log(`📱 Local: http://localhost:${PORT}`);
+            console.log(`🌐 Environment: ${process.env.NODE_ENV || 'development'}`);
+            console.log('✅ Application initialized successfully!');
+        });
+
+    } catch (error) {
+        console.error('❌ Failed to initialize application:', error.message);
+        process.exit(1);
+    }
+};
+
+// Initialize the application
+initializeApp();
+
+module.exports = app;
 
 module.exports = app;

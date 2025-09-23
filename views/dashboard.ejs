@@ -1,0 +1,231 @@
+<div class="dashboard-section">
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Sidebar -->
+            <div class="col-md-3 col-lg-2 sidebar">
+                <div class="sidebar-content">
+                    <div class="user-info">
+                        <div class="user-avatar-large">
+                            <i class="fas fa-user"></i>
+                        </div>
+                        <h5><%= user.fullName %></h5>
+                        <span class="badge badge-<%= user.userType === 'provider' ? 'success' : 'primary' %>">
+                            <%= user.userType === 'provider' ? 'Service Provider' : 'Customer' %>
+                        </span>
+                    </div>
+                    
+                    <nav class="sidebar-nav">
+                        <ul class="nav flex-column">
+                            <li class="nav-item">
+                                <a class="nav-link active" href="/dashboard">
+                                    <i class="fas fa-tachometer-alt"></i>
+                                    Dashboard
+                                </a>
+                            </li>
+                            <% if (user.userType === 'customer') { %>
+                                <li class="nav-item">
+                                    <a class="nav-link" href="/bookings">
+                                        <i class="fas fa-calendar-check"></i>
+                                        My Bookings
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" href="/services">
+                                        <i class="fas fa-search"></i>
+                                        Find Services
+                                    </a>
+                                </li>
+                            <% } else { %>
+                                <li class="nav-item">
+                                    <a class="nav-link" href="/my-services">
+                                        <i class="fas fa-tools"></i>
+                                        My Services
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" href="/bookings/manage">
+                                        <i class="fas fa-calendar-alt"></i>
+                                        Manage Bookings
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" href="/earnings">
+                                        <i class="fas fa-chart-line"></i>
+                                        Earnings
+                                    </a>
+                                </li>
+                            <% } %>
+                            <li class="nav-item">
+                                <a class="nav-link" href="/profile">
+                                    <i class="fas fa-user-cog"></i>
+                                    Profile Settings
+                                </a>
+                            </li>
+                            <li class="nav-item mt-3">
+                                <a class="nav-link text-danger" href="#" onclick="logout()">
+                                    <i class="fas fa-sign-out-alt"></i>
+                                    Logout
+                                </a>
+                            </li>
+                        </ul>
+                    </nav>
+                </div>
+            </div>
+            
+            <!-- Main Content -->
+            <div class="col-md-9 col-lg-10 main-content">
+                <div class="dashboard-header">
+                    <h2>Welcome back, <%= user.firstName %>!</h2>
+                    <p class="text-muted">Here's what's happening with your account today.</p>
+                </div>
+                
+                <!-- Account Info Cards -->
+                <div class="row mb-4">
+                    <div class="col-lg-3 col-md-6 mb-3">
+                        <div class="info-card">
+                            <div class="info-icon">
+                                <i class="fas fa-user"></i>
+                            </div>
+                            <div class="info-content">
+                                <h6>Account Type</h6>
+                                <p><%= user.userType === 'provider' ? 'Service Provider' : 'Customer' %></p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-lg-3 col-md-6 mb-3">
+                        <div class="info-card">
+                            <div class="info-icon">
+                                <i class="fas fa-calendar"></i>
+                            </div>
+                            <div class="info-content">
+                                <h6>Member Since</h6>
+                                <p><%= new Date(user.createdAt).toLocaleDateString() %></p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-lg-3 col-md-6 mb-3">
+                        <div class="info-card">
+                            <div class="info-icon">
+                                <i class="fas fa-envelope"></i>
+                            </div>
+                            <div class="info-content">
+                                <h6>Email</h6>
+                                <p><%= user.email %></p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-lg-3 col-md-6 mb-3">
+                        <div class="info-card">
+                            <div class="info-icon">
+                                <i class="fas fa-phone"></i>
+                            </div>
+                            <div class="info-content">
+                                <h6>Phone</h6>
+                                <p><%= user.phone %></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Quick Actions -->
+                <div class="row">
+                    <div class="col-12">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="card-title mb-0">Quick Actions</h5>
+                            </div>
+                            <div class="card-body">
+                                <% if (user.userType === 'customer') { %>
+                                    <div class="row">
+                                        <div class="col-md-4 mb-3">
+                                            <a href="/services" class="action-card">
+                                                <div class="action-icon">
+                                                    <i class="fas fa-search"></i>
+                                                </div>
+                                                <h6>Find Services</h6>
+                                                <p>Browse and book home services</p>
+                                            </a>
+                                        </div>
+                                        <div class="col-md-4 mb-3">
+                                            <a href="/bookings" class="action-card">
+                                                <div class="action-icon">
+                                                    <i class="fas fa-calendar-check"></i>
+                                                </div>
+                                                <h6>My Bookings</h6>
+                                                <p>View your service bookings</p>
+                                            </a>
+                                        </div>
+                                        <div class="col-md-4 mb-3">
+                                            <a href="/profile" class="action-card">
+                                                <div class="action-icon">
+                                                    <i class="fas fa-user-edit"></i>
+                                                </div>
+                                                <h6>Update Profile</h6>
+                                                <p>Edit your account information</p>
+                                            </a>
+                                        </div>
+                                    </div>
+                                <% } else { %>
+                                    <div class="row">
+                                        <div class="col-md-4 mb-3">
+                                            <a href="/my-services" class="action-card">
+                                                <div class="action-icon">
+                                                    <i class="fas fa-plus"></i>
+                                                </div>
+                                                <h6>Add Services</h6>
+                                                <p>Create new service offerings</p>
+                                            </a>
+                                        </div>
+                                        <div class="col-md-4 mb-3">
+                                            <a href="/bookings/manage" class="action-card">
+                                                <div class="action-icon">
+                                                    <i class="fas fa-tasks"></i>
+                                                </div>
+                                                <h6>Manage Bookings</h6>
+                                                <p>Handle customer requests</p>
+                                            </a>
+                                        </div>
+                                        <div class="col-md-4 mb-3">
+                                            <a href="/earnings" class="action-card">
+                                                <div class="action-icon">
+                                                    <i class="fas fa-chart-line"></i>
+                                                </div>
+                                                <h6>View Earnings</h6>
+                                                <p>Track your income</p>
+                                            </a>
+                                        </div>
+                                    </div>
+                                <% } %>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+async function logout() {
+    try {
+        const response = await fetch('/auth/logout', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        });
+        
+        if (response.ok) {
+            window.location.href = '/';
+        } else {
+            alert('Error logging out');
+        }
+    } catch (error) {
+        console.error('Logout error:', error);
+        alert('Error logging out');
+    }
+}
+</script>

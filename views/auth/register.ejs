@@ -243,7 +243,7 @@ document.getElementById('password').addEventListener('input', function() {
 });
 
 // Form validation
-document.getElementById('registerForm').addEventListener('submit', function(e) {
+document.getElementById('registerForm').addEventListener('submit', async function(e) {
     e.preventDefault();
     
     const password = document.getElementById('password').value;
@@ -261,26 +261,41 @@ document.getElementById('registerForm').addEventListener('submit', function(e) {
     submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Creating Account...';
     submitBtn.disabled = true;
     
-    // Get form data
-    const formData = {
-        firstName: document.getElementById('firstName').value,
-        lastName: document.getElementById('lastName').value,
-        email: document.getElementById('email').value,
-        phone: document.getElementById('phone').value,
-        password: password,
-        userType: userType // This will be used for database tagging
-    };
-    
-    console.log('Registration data:', formData);
-    
-    // Simulate API call
-    setTimeout(() => {
+    try {
+        // Get form data
+        const formData = {
+            firstName: document.getElementById('firstName').value,
+            lastName: document.getElementById('lastName').value,
+            email: document.getElementById('email').value,
+            phone: document.getElementById('phone').value,
+            password: password,
+            userType: userType
+        };
+        
+        const response = await fetch('/auth/register', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(formData)
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            // Redirect to dashboard
+            alert('Account created successfully!');
+            window.location.href = '/dashboard';
+        } else {
+            alert(data.message || 'Registration failed');
+        }
+    } catch (error) {
+        console.error('Registration error:', error);
+        alert('Network error. Please try again.');
+    } finally {
         // Reset button
         submitBtn.innerHTML = originalText;
         submitBtn.disabled = false;
-        
-        // Show success message
-        alert(`Registration functionality will be implemented in backend! User type: ${userType}`);
-    }, 2000);
+    }
 });
 </script>
