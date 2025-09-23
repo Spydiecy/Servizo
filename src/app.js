@@ -63,27 +63,203 @@ const initializeApp = async () => {
             });
         });
 
-        // Temporary routes for development
+        // Coming soon pages - These will show 404 until implemented
         app.get('/about', (req, res) => {
-            res.json({ message: 'About page - Coming soon!' });
+            res.status(404).render('layouts/main', {
+                title: 'Page Not Found',
+                page: '404',
+                user: req.user
+            });
         });
 
         app.get('/contact', (req, res) => {
-            res.json({ message: 'Contact page - Coming soon!' });
+            res.status(404).render('layouts/main', {
+                title: 'Page Not Found',
+                page: '404',
+                user: req.user
+            });
         });
 
         app.get('/profile', isAuthenticated, (req, res) => {
-            res.json({ message: 'Profile page - Coming soon!' });
+            res.status(404).render('layouts/main', {
+                title: 'Page Not Found',
+                page: '404',
+                user: req.user
+            });
         });
 
-        // Error handling
-        app.use((req, res) => {
-            res.status(404).json({ message: 'Page not found' });
+        // Additional routes that might be accessed but don't exist yet
+        app.get('/help', (req, res) => {
+            res.status(404).render('layouts/main', {
+                title: 'Page Not Found',
+                page: '404',
+                user: req.user
+            });
         });
 
+        app.get('/support', (req, res) => {
+            res.status(404).render('layouts/main', {
+                title: 'Page Not Found',
+                page: '404',
+                user: req.user
+            });
+        });
+
+        app.get('/faq', (req, res) => {
+            res.status(404).render('layouts/main', {
+                title: 'Page Not Found',
+                page: '404',
+                user: req.user
+            });
+        });
+
+        app.get('/pricing', (req, res) => {
+            res.status(404).render('layouts/main', {
+                title: 'Page Not Found',
+                page: '404',
+                user: req.user
+            });
+        });
+
+        app.get('/how-it-works', (req, res) => {
+            res.status(404).render('layouts/main', {
+                title: 'Page Not Found',
+                page: '404',
+                user: req.user
+            });
+        });
+
+        // Footer links that don't exist yet
+        app.get('/become-provider', (req, res) => {
+            res.status(404).render('layouts/main', {
+                title: 'Page Not Found',
+                page: '404',
+                user: req.user
+            });
+        });
+
+        app.get('/privacy', (req, res) => {
+            res.status(404).render('layouts/main', {
+                title: 'Page Not Found',
+                page: '404',
+                user: req.user
+            });
+        });
+
+        app.get('/terms', (req, res) => {
+            res.status(404).render('layouts/main', {
+                title: 'Page Not Found',
+                page: '404',
+                user: req.user
+            });
+        });
+
+        app.get('/refund', (req, res) => {
+            res.status(404).render('layouts/main', {
+                title: 'Page Not Found',
+                page: '404',
+                user: req.user
+            });
+        });
+
+        // Common pages people might try to access
+        app.get('/careers', (req, res) => {
+            res.status(404).render('layouts/main', {
+                title: 'Page Not Found',
+                page: '404',
+                user: req.user
+            });
+        });
+
+        app.get('/blog', (req, res) => {
+            res.status(404).render('layouts/main', {
+                title: 'Page Not Found',
+                page: '404',
+                user: req.user
+            });
+        });
+
+        app.get('/news', (req, res) => {
+            res.status(404).render('layouts/main', {
+                title: 'Page Not Found',
+                page: '404',
+                user: req.user
+            });
+        });
+
+        // Handle common bot/crawler requests with appropriate responses
+        app.get('/robots.txt', (req, res) => {
+            res.type('text/plain');
+            res.send(`User-agent: *
+Disallow: /admin/
+Disallow: /api/
+Disallow: /auth/
+Allow: /
+
+Sitemap: ${req.protocol}://${req.get('host')}/sitemap.xml`);
+        });
+
+        app.get('/favicon.ico', (req, res) => {
+            res.status(204).end(); // No content
+        });
+
+        app.get('/sitemap.xml', (req, res) => {
+            res.type('application/xml');
+            res.send(`<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url>
+    <loc>${req.protocol}://${req.get('host')}/</loc>
+    <changefreq>daily</changefreq>
+    <priority>1.0</priority>
+  </url>
+  <url>
+    <loc>${req.protocol}://${req.get('host')}/services</loc>
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+  </url>
+</urlset>`);
+        });
+
+        // Admin routes (not implemented yet)
+        app.get('/admin*', isAuthenticated, (req, res) => {
+            res.status(404).render('layouts/main', {
+                title: 'Page Not Found',
+                page: '404',
+                user: req.user
+            });
+        });
+
+        // API routes that don't exist
+        app.use('/api*', (req, res) => {
+            res.status(404).json({
+                success: false,
+                message: 'API endpoint not found',
+                error: 'The requested API endpoint does not exist'
+            });
+        });
+
+        // Catch-all 404 handler - MUST be the last route
+        app.use('*', (req, res) => {
+            res.status(404).render('layouts/main', {
+                title: 'Page Not Found',
+                page: '404',
+                user: req.user
+            });
+        });
+
+        // 500 Error handling
         app.use((err, req, res, next) => {
-            console.error(err.stack);
-            res.status(500).json({ message: 'Something went wrong!' });
+            console.error('❌ Server Error:', err.stack);
+            
+            // Don't expose error details in production
+            const isDevelopment = process.env.NODE_ENV === 'development';
+            
+            res.status(500).render('layouts/main', {
+                title: 'Server Error',
+                page: '500',
+                user: req.user,
+                error: isDevelopment ? err.message : 'Something went wrong!'
+            });
         });
 
         // Start server

@@ -1,0 +1,456 @@
+<!-- 404 Page -->
+<section class="error-section d-flex align-items-center justify-content-center" style="min-height: calc(100vh - 80px); padding-top: 2rem; padding-bottom: 2rem;">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-6 col-md-8 col-12">
+                <div class="error-content text-center">
+                    <!-- 404 Illustration -->
+                    <div class="error-illustration mb-4">
+                        <div class="error-icon-container">
+                            <div class="error-icon">
+                                <i class="fas fa-tools"></i>
+                            </div>
+                            <div class="error-number">404</div>
+                        </div>
+                    </div>
+                    
+                    <!-- Error Message -->
+                    <div class="error-message">
+                        <h1 class="error-title mb-3">Service Not Found</h1>
+                        <p class="error-description mb-4">
+                            Oops! The service you're looking for seems to have gone off-duty. 
+                            Don't worry, our other services are still available and ready to help!
+                        </p>
+                    </div>
+                    
+                    <!-- Search Box -->
+                    <div class="error-search mb-4">
+                        <form action="/services" method="GET" class="search-form">
+                            <div class="input-group">
+                                <input 
+                                    type="text" 
+                                    name="search" 
+                                    class="form-control" 
+                                    placeholder="Search for services..."
+                                    aria-label="Search for services"
+                                >
+                                <button class="btn btn-primary" type="submit">
+                                    <i class="fas fa-search me-2"></i>
+                                    Search
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                    
+                    <!-- Action Buttons -->
+                    <div class="error-actions">
+                        <a href="/" class="btn btn-primary btn-lg me-3">
+                            <i class="fas fa-home me-2"></i>
+                            Go Home
+                        </a>
+                        <a href="/services" class="btn btn-outline-primary btn-lg">
+                            <i class="fas fa-list me-2"></i>
+                            Browse Services
+                        </a>
+                    </div>
+                    
+                    <!-- Popular Services -->
+                    <div class="popular-services mt-5">
+                        <h5 class="mb-3">Popular Services</h5>
+                        <div class="row g-3">
+                            <div class="col-6 col-md-3">
+                                <a href="/services?category=cleaning" class="service-link">
+                                    <div class="mini-service-card">
+                                        <div class="mini-service-icon">
+                                            <i class="fas fa-broom"></i>
+                                        </div>
+                                        <span>Cleaning</span>
+                                    </div>
+                                </a>
+                            </div>
+                            <div class="col-6 col-md-3">
+                                <a href="/services?category=repair" class="service-link">
+                                    <div class="mini-service-card">
+                                        <div class="mini-service-icon">
+                                            <i class="fas fa-wrench"></i>
+                                        </div>
+                                        <span>Repair</span>
+                                    </div>
+                                </a>
+                            </div>
+                            <div class="col-6 col-md-3">
+                                <a href="/services?category=plumbing" class="service-link">
+                                    <div class="mini-service-card">
+                                        <div class="mini-service-icon">
+                                            <i class="fas fa-faucet"></i>
+                                        </div>
+                                        <span>Plumbing</span>
+                                    </div>
+                                </a>
+                            </div>
+                            <div class="col-6 col-md-3">
+                                <a href="/services?category=electrical" class="service-link">
+                                    <div class="mini-service-card">
+                                        <div class="mini-service-icon">
+                                            <i class="fas fa-bolt"></i>
+                                        </div>
+                                        <span>Electrical</span>
+                                    </div>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Help Contact -->
+                    <div class="error-help mt-4">
+                        <p class="text-muted mb-2">Still need help?</p>
+                        <a href="/contact" class="text-primary text-decoration-none">
+                            <i class="fas fa-headset me-1"></i>
+                            Contact our support team
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<style>
+.error-section {
+    background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+    position: relative;
+    overflow: hidden;
+    min-height: calc(100vh - 80px);
+    padding-top: 2rem;
+    padding-bottom: 2rem;
+}
+
+.error-section::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(59, 130, 246, 0.05) 0%, transparent 70%);
+    animation: float 20s ease-in-out infinite;
+}
+
+@keyframes float {
+    0%, 100% { transform: translateY(0px) rotate(0deg); }
+    50% { transform: translateY(-20px) rotate(180deg); }
+}
+
+.error-content {
+    position: relative;
+    z-index: 2;
+    padding: 1rem 0;
+}
+
+.error-icon-container {
+    position: relative;
+    display: inline-block;
+    margin-bottom: 2rem;
+}
+
+.error-icon {
+    width: 120px;
+    height: 120px;
+    background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 3rem;
+    color: white;
+    margin: 0 auto;
+    position: relative;
+    animation: bounce 2s infinite;
+}
+
+.error-number {
+    position: absolute;
+    top: -20px;
+    right: -30px;
+    background: var(--danger-color);
+    color: white;
+    padding: 8px 16px;
+    border-radius: 25px;
+    font-size: 1.25rem;
+    font-weight: 700;
+    box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+    z-index: 1;
+}
+
+@keyframes bounce {
+    0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+    40% { transform: translateY(-10px); }
+    60% { transform: translateY(-5px); }
+}
+
+.error-title {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: var(--dark-color);
+    background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 1rem;
+}
+
+.error-description {
+    font-size: 1.125rem;
+    color: var(--secondary-color);
+    line-height: 1.6;
+    max-width: 500px;
+    margin: 0 auto 2rem;
+}
+
+.error-search {
+    max-width: 400px;
+    margin: 0 auto 2rem;
+}
+
+.error-search .input-group {
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.error-search .form-control {
+    border: none;
+    padding: 14px 20px;
+    font-size: 1rem;
+    background: white;
+}
+
+.error-search .form-control:focus {
+    box-shadow: none;
+    outline: none;
+}
+
+.error-search .btn {
+    padding: 14px 24px;
+    font-weight: 600;
+    border: none;
+}
+
+.error-actions {
+    margin-bottom: 2rem;
+}
+
+.error-actions .btn {
+    padding: 12px 32px;
+    font-weight: 600;
+    border-radius: 12px;
+    transition: all 0.3s ease;
+    margin: 0.5rem;
+}
+
+.error-actions .btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+}
+
+.popular-services {
+    margin-top: 2rem;
+    padding-top: 2rem;
+    border-top: 1px solid #e2e8f0;
+}
+
+.popular-services h5 {
+    color: var(--dark-color);
+    font-weight: 600;
+    margin-bottom: 1.5rem;
+}
+
+.service-link {
+    text-decoration: none;
+    color: inherit;
+    display: block;
+}
+
+.mini-service-card {
+    background: white;
+    border-radius: 12px;
+    padding: 1.5rem 1rem;
+    text-align: center;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    border: 1px solid #e2e8f0;
+    transition: all 0.3s ease;
+    height: 100%;
+    margin-bottom: 1rem;
+}
+
+.mini-service-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+    border-color: var(--primary-color);
+}
+
+.mini-service-icon {
+    width: 50px;
+    height: 50px;
+    background: linear-gradient(135deg, var(--primary-light), var(--primary-color));
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 0.75rem;
+    color: white;
+    font-size: 1.25rem;
+}
+
+.mini-service-card span {
+    color: var(--dark-color);
+    font-weight: 500;
+    font-size: 0.875rem;
+}
+
+.error-help {
+    margin-top: 2rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid #e2e8f0;
+}
+
+.error-help a:hover {
+    text-decoration: underline !important;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .error-section {
+        min-height: calc(100vh - 70px);
+        padding-top: 1rem;
+        padding-bottom: 1rem;
+    }
+    
+    .error-content {
+        padding: 0.5rem 0;
+    }
+    
+    .error-title {
+        font-size: 2rem;
+        margin-bottom: 0.75rem;
+    }
+    
+    .error-description {
+        font-size: 1rem;
+        margin-bottom: 1.5rem;
+    }
+    
+    .error-icon {
+        width: 100px;
+        height: 100px;
+        font-size: 2.5rem;
+        margin-bottom: 1rem;
+    }
+    
+    .error-number {
+        top: -15px;
+        right: -25px;
+        padding: 6px 12px;
+        font-size: 1rem;
+    }
+    
+    .error-actions {
+        margin-bottom: 1.5rem;
+    }
+    
+    .error-actions .btn {
+        display: block;
+        width: 100%;
+        margin: 0.5rem 0;
+        padding: 10px 24px;
+    }
+    
+    .error-search {
+        margin-bottom: 1.5rem;
+    }
+    
+    .popular-services {
+        margin-top: 1.5rem;
+        padding-top: 1.5rem;
+    }
+    
+    .popular-services h5 {
+        margin-bottom: 1rem;
+    }
+    
+    .mini-service-card {
+        padding: 1rem 0.5rem;
+    }
+    
+    .mini-service-icon {
+        width: 40px;
+        height: 40px;
+        font-size: 1rem;
+    }
+    
+    .mini-service-card span {
+        font-size: 0.75rem;
+    }
+}
+
+@media (max-width: 576px) {
+    .error-section {
+        padding: 1rem 0;
+    }
+    
+    .error-title {
+        font-size: 1.75rem;
+    }
+    
+    .error-icon-container {
+        margin-bottom: 1.5rem;
+    }
+    
+    .error-search .input-group {
+        flex-direction: column;
+    }
+    
+    .error-search .form-control {
+        border-radius: 12px !important;
+        margin-bottom: 0.5rem;
+    }
+    
+    .error-search .btn {
+        border-radius: 12px !important;
+    }
+    
+    .popular-services .row {
+        margin: 0 -0.5rem;
+    }
+    
+    .popular-services .col-6 {
+        padding: 0 0.5rem;
+        margin-bottom: 1rem;
+    }
+}
+
+/* Small devices fix */
+@media (max-width: 480px) {
+    .error-section {
+        min-height: calc(100vh - 60px);
+    }
+    
+    .container {
+        padding-left: 1rem;
+        padding-right: 1rem;
+    }
+    
+    .error-title {
+        font-size: 1.5rem;
+    }
+    
+    .error-description {
+        font-size: 0.9rem;
+    }
+    
+    .error-actions .btn {
+        font-size: 0.9rem;
+        padding: 8px 20px;
+    }
+}
+</style>

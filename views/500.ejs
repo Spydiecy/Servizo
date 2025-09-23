@@ -1,0 +1,434 @@
+<!-- 500 Server Error Page -->
+<section class="error-section d-flex align-items-center justify-content-center" style="min-height: calc(100vh - 80px); padding-top: 2rem; padding-bottom: 2rem;">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-6 col-md-8 col-12">
+                <div class="error-content text-center">
+                    <!-- 500 Illustration -->
+                    <div class="error-illustration mb-4">
+                        <div class="error-icon-container">
+                            <div class="error-icon server-error">
+                                <i class="fas fa-server"></i>
+                            </div>
+                            <div class="error-number server-error-number">500</div>
+                        </div>
+                    </div>
+                    
+                    <!-- Error Message -->
+                    <div class="error-message">
+                        <h1 class="error-title mb-3">Server Under Maintenance</h1>
+                        <p class="error-description mb-4">
+                            Our service technicians are currently working on some updates. 
+                            We'll be back online shortly to serve you better!
+                        </p>
+                    </div>
+                    
+                    <!-- Status Info -->
+                    <div class="server-status mb-4">
+                        <div class="status-indicator">
+                            <div class="status-light"></div>
+                            <span class="status-text">Working on it...</span>
+                        </div>
+                    </div>
+                    
+                    <!-- Action Buttons -->
+                    <div class="error-actions">
+                        <a href="/" class="btn btn-primary btn-lg me-3">
+                            <i class="fas fa-home me-2"></i>
+                            Go Home
+                        </a>
+                        <button onclick="window.location.reload()" class="btn btn-outline-primary btn-lg">
+                            <i class="fas fa-refresh me-2"></i>
+                            Try Again
+                        </button>
+                    </div>
+                    
+                    <!-- What You Can Do -->
+                    <div class="helpful-tips mt-5">
+                        <h5 class="mb-3">What you can do:</h5>
+                        <div class="row g-3">
+                            <div class="col-md-4">
+                                <div class="tip-card">
+                                    <div class="tip-icon">
+                                        <i class="fas fa-clock"></i>
+                                    </div>
+                                    <h6>Wait a moment</h6>
+                                    <p>Try refreshing the page in a few minutes</p>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="tip-card">
+                                    <div class="tip-icon">
+                                        <i class="fas fa-bookmark"></i>
+                                    </div>
+                                    <h6>Bookmark this page</h6>
+                                    <p>Come back later when we're ready</p>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="tip-card">
+                                    <div class="tip-icon">
+                                        <i class="fas fa-headset"></i>
+                                    </div>
+                                    <h6>Contact Support</h6>
+                                    <p>If the problem persists</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Contact Info -->
+                    <div class="error-help mt-4">
+                        <p class="text-muted mb-2">Need immediate assistance?</p>
+                        <a href="/contact" class="text-primary text-decoration-none">
+                            <i class="fas fa-envelope me-1"></i>
+                            support@servizo.com
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<style>
+.error-section {
+    background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%);
+    position: relative;
+    overflow: hidden;
+    min-height: calc(100vh - 80px);
+    padding-top: 2rem;
+    padding-bottom: 2rem;
+}
+
+.error-section::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(239, 68, 68, 0.05) 0%, transparent 70%);
+    animation: pulse 15s ease-in-out infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 0.5; transform: scale(1); }
+    50% { opacity: 0.8; transform: scale(1.1); }
+}
+
+.error-content {
+    position: relative;
+    z-index: 2;
+    padding: 1rem 0;
+}
+
+.error-icon-container {
+    position: relative;
+    display: inline-block;
+    margin-bottom: 2rem;
+}
+
+.error-icon.server-error {
+    width: 120px;
+    height: 120px;
+    background: linear-gradient(135deg, #ef4444, #dc2626);
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 3rem;
+    color: white;
+    margin: 0 auto;
+    position: relative;
+    animation: shake 3s ease-in-out infinite;
+}
+
+.error-number.server-error-number {
+    position: absolute;
+    top: -20px;
+    right: -30px;
+    background: #f59e0b;
+    color: white;
+    padding: 8px 16px;
+    border-radius: 25px;
+    font-size: 1.25rem;
+    font-weight: 700;
+    box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
+    z-index: 1;
+}
+
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-5px); }
+    75% { transform: translateX(5px); }
+}
+
+.error-title {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: var(--dark-color);
+    background: linear-gradient(135deg, #ef4444, #dc2626);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 1rem;
+}
+
+.error-description {
+    font-size: 1.125rem;
+    color: var(--secondary-color);
+    line-height: 1.6;
+    max-width: 500px;
+    margin: 0 auto 2rem;
+}
+
+.server-status {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    padding: 1rem 2rem;
+    background: rgba(239, 68, 68, 0.1);
+    border-radius: 12px;
+    border: 1px solid rgba(239, 68, 68, 0.2);
+    margin-bottom: 2rem;
+    max-width: 400px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.status-indicator {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.status-light {
+    width: 12px;
+    height: 12px;
+    background: #f59e0b;
+    border-radius: 50%;
+    animation: blink 2s infinite;
+}
+
+@keyframes blink {
+    0%, 50% { opacity: 1; }
+    51%, 100% { opacity: 0.3; }
+}
+
+.status-text {
+    color: #ef4444;
+    font-weight: 600;
+    font-size: 0.9rem;
+}
+
+.error-actions {
+    margin-bottom: 2rem;
+}
+
+.error-actions .btn {
+    padding: 12px 32px;
+    font-weight: 600;
+    border-radius: 12px;
+    transition: all 0.3s ease;
+    margin: 0.5rem;
+}
+
+.error-actions .btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+}
+
+.helpful-tips {
+    margin-top: 2rem;
+    padding-top: 2rem;
+    border-top: 1px solid #fecaca;
+}
+
+.helpful-tips h5 {
+    color: var(--dark-color);
+    font-weight: 600;
+    margin-bottom: 1.5rem;
+}
+
+.tip-card {
+    background: white;
+    border-radius: 12px;
+    padding: 1.5rem 1rem;
+    text-align: center;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    border: 1px solid #fecaca;
+    transition: all 0.3s ease;
+    height: 100%;
+    margin-bottom: 1rem;
+}
+
+.tip-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+    border-color: #ef4444;
+}
+
+.tip-icon {
+    width: 50px;
+    height: 50px;
+    background: linear-gradient(135deg, #fca5a5, #ef4444);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1rem;
+    color: white;
+    font-size: 1.25rem;
+}
+
+.tip-card h6 {
+    color: var(--dark-color);
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    font-size: 0.95rem;
+}
+
+.tip-card p {
+    color: var(--secondary-color);
+    font-size: 0.85rem;
+    margin: 0;
+    line-height: 1.4;
+}
+
+.error-help {
+    margin-top: 2rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid #fecaca;
+}
+
+.error-help a:hover {
+    text-decoration: underline !important;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .error-section {
+        min-height: calc(100vh - 70px);
+        padding-top: 1rem;
+        padding-bottom: 1rem;
+    }
+    
+    .error-content {
+        padding: 0.5rem 0;
+    }
+    
+    .error-title {
+        font-size: 2rem;
+        margin-bottom: 0.75rem;
+    }
+    
+    .error-description {
+        font-size: 1rem;
+        margin-bottom: 1.5rem;
+    }
+    
+    .error-icon.server-error {
+        width: 100px;
+        height: 100px;
+        font-size: 2.5rem;
+        margin-bottom: 1rem;
+    }
+    
+    .error-number.server-error-number {
+        top: -15px;
+        right: -25px;
+        padding: 6px 12px;
+        font-size: 1rem;
+    }
+    
+    .error-actions {
+        margin-bottom: 1.5rem;
+    }
+    
+    .error-actions .btn {
+        display: block;
+        width: 100%;
+        margin: 0.5rem 0;
+        padding: 10px 24px;
+    }
+    
+    .server-status {
+        padding: 0.75rem 1rem;
+        margin-bottom: 1.5rem;
+    }
+    
+    .helpful-tips {
+        margin-top: 1.5rem;
+        padding-top: 1.5rem;
+    }
+    
+    .helpful-tips h5 {
+        margin-bottom: 1rem;
+    }
+    
+    .tip-card {
+        padding: 1rem 0.75rem;
+    }
+    
+    .tip-icon {
+        width: 40px;
+        height: 40px;
+        font-size: 1rem;
+    }
+}
+
+@media (max-width: 576px) {
+    .error-section {
+        padding: 1rem 0;
+    }
+    
+    .error-title {
+        font-size: 1.75rem;
+    }
+    
+    .error-icon-container {
+        margin-bottom: 1.5rem;
+    }
+    
+    .helpful-tips .row {
+        margin: 0 -0.5rem;
+    }
+    
+    .helpful-tips .col-md-4 {
+        padding: 0 0.5rem;
+        margin-bottom: 1rem;
+    }
+}
+
+/* Small devices fix */
+@media (max-width: 480px) {
+    .error-section {
+        min-height: calc(100vh - 60px);
+    }
+    
+    .container {
+        padding-left: 1rem;
+        padding-right: 1rem;
+    }
+    
+    .error-title {
+        font-size: 1.5rem;
+    }
+    
+    .error-description {
+        font-size: 0.9rem;
+    }
+    
+    .error-actions .btn {
+        font-size: 0.9rem;
+        padding: 8px 20px;
+    }
+    
+    .server-status {
+        padding: 0.5rem 1rem;
+        font-size: 0.85rem;
+    }
+}
+</style>
