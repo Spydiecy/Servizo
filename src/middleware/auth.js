@@ -110,6 +110,20 @@ const addUserToLocals = (req, res, next) => {
     next();
 };
 
+// Check if user is a service provider (simplified)
+const isProvider = (req, res, next) => {
+    if (!req.user || req.user.userType !== 'provider') {
+        if (req.headers.accept?.includes('application/json')) {
+            return res.status(403).json({
+                success: false,
+                message: 'Service provider access required'
+            });
+        }
+        return res.redirect('/dashboard');
+    }
+    next();
+};
+
 module.exports = {
     isAuthenticated,
     isNotAuthenticated,
@@ -117,5 +131,6 @@ module.exports = {
     requireRole,
     requireProvider,
     requireCustomer,
-    addUserToLocals
+    addUserToLocals,
+    isProvider
 };

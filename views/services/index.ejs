@@ -1,0 +1,437 @@
+<div class="services-page">
+    <!-- Hero Section -->
+    <section class="services-hero">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-lg-6">
+                    <h1 class="hero-title">Find Professional Services</h1>
+                    <p class="hero-subtitle">Browse thousands of verified service providers near you</p>
+                </div>
+                <div class="col-lg-6">
+                    <div class="search-box">
+                        <form id="serviceSearchForm">
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <input type="text" class="form-control" id="searchQuery" placeholder="Search services...">
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <input type="text" class="form-control" id="citySearch" placeholder="Enter your city...">
+                                </div>
+                            </div>
+                            <button type="submit" class="btn btn-primary w-100">
+                                <i class="fas fa-search"></i> Search Services
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Categories Section -->
+    <section class="categories-section py-5">
+        <div class="container">
+            <h2 class="text-center mb-5">Browse by Category</h2>
+            <div class="row" id="categoriesGrid">
+                <div class="col-lg-3 col-md-4 col-sm-6 mb-4">
+                    <div class="category-card" data-category="cleaning">
+                        <div class="category-icon">
+                            <i class="fas fa-broom"></i>
+                        </div>
+                        <h5>Cleaning</h5>
+                        <p>House cleaning, deep cleaning, office cleaning</p>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-4 col-sm-6 mb-4">
+                    <div class="category-card" data-category="ac">
+                        <div class="category-icon">
+                            <i class="fas fa-snowflake"></i>
+                        </div>
+                        <h5>AC Services</h5>
+                        <p>AC repair, installation, maintenance</p>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-4 col-sm-6 mb-4">
+                    <div class="category-card" data-category="plumbing">
+                        <div class="category-icon">
+                            <i class="fas fa-wrench"></i>
+                        </div>
+                        <h5>Plumbing</h5>
+                        <p>Pipe repair, tap installation, drainage</p>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-4 col-sm-6 mb-4">
+                    <div class="category-card" data-category="electrical">
+                        <div class="category-icon">
+                            <i class="fas fa-bolt"></i>
+                        </div>
+                        <h5>Electrical</h5>
+                        <p>Wiring, switch repair, electrical fittings</p>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-4 col-sm-6 mb-4">
+                    <div class="category-card" data-category="painting">
+                        <div class="category-icon">
+                            <i class="fas fa-paint-roller"></i>
+                        </div>
+                        <h5>Painting</h5>
+                        <p>Wall painting, texture, waterproofing</p>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-4 col-sm-6 mb-4">
+                    <div class="category-card" data-category="beauty">
+                        <div class="category-icon">
+                            <i class="fas fa-cut"></i>
+                        </div>
+                        <h5>Beauty & Salon</h5>
+                        <p>Hair, makeup, spa, grooming services</p>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-4 col-sm-6 mb-4">
+                    <div class="category-card" data-category="appliance">
+                        <div class="category-icon">
+                            <i class="fas fa-tv"></i>
+                        </div>
+                        <h5>Appliance Repair</h5>
+                        <p>TV, refrigerator, washing machine repair</p>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-4 col-sm-6 mb-4">
+                    <div class="category-card" data-category="pest-control">
+                        <div class="category-icon">
+                            <i class="fas fa-bug"></i>
+                        </div>
+                        <h5>Pest Control</h5>
+                        <p>Termite, cockroach, ant control</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Filters Section -->
+    <section class="filters-section py-4 bg-light">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-md-6">
+                    <h4 id="resultsTitle">All Services</h4>
+                    <p id="resultsCount" class="text-muted">Loading services...</p>
+                </div>
+                <div class="col-md-6">
+                    <div class="filters">
+                        <div class="row">
+                            <div class="col-md-4">
+                                <select class="form-control" id="sortBy">
+                                    <option value="createdAt">Newest First</option>
+                                    <option value="price">Price: Low to High</option>
+                                    <option value="rating">Highest Rated</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4">
+                                <input type="number" class="form-control" id="minPrice" placeholder="Min Price">
+                            </div>
+                            <div class="col-md-4">
+                                <input type="number" class="form-control" id="maxPrice" placeholder="Max Price">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Services Grid -->
+    <section class="services-grid py-5">
+        <div class="container">
+            <div id="servicesGrid" class="row">
+                <!-- Services will be loaded here -->
+            </div>
+            
+            <!-- Loading indicator -->
+            <div id="loadingIndicator" class="text-center py-4">
+                <div class="spinner-border text-primary" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+                <p class="mt-2">Loading services...</p>
+            </div>
+            
+            <!-- No results message -->
+            <div id="noResults" class="text-center py-5" style="display: none;">
+                <i class="fas fa-search fa-3x text-muted mb-3"></i>
+                <h4>No Services Found</h4>
+                <p class="text-muted">Try adjusting your search criteria or browse different categories.</p>
+            </div>
+            
+            <!-- Pagination -->
+            <nav id="pagination" class="mt-4" style="display: none;">
+                <ul class="pagination justify-content-center">
+                    <!-- Pagination will be generated here -->
+                </ul>
+            </nav>
+        </div>
+    </section>
+</div>
+
+<script>
+let currentPage = 1;
+let currentCategory = '';
+let currentCity = '';
+let currentFilters = {};
+
+// Initialize page
+document.addEventListener('DOMContentLoaded', function() {
+    loadServices();
+    setupEventListeners();
+});
+
+function setupEventListeners() {
+    // Category cards
+    document.querySelectorAll('.category-card').forEach(card => {
+        card.addEventListener('click', function() {
+            const category = this.dataset.category;
+            filterByCategory(category);
+        });
+    });
+    
+    // Search form
+    document.getElementById('serviceSearchForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        searchServices();
+    });
+    
+    // Filters
+    document.getElementById('sortBy').addEventListener('change', applyFilters);
+    document.getElementById('minPrice').addEventListener('input', debounce(applyFilters, 500));
+    document.getElementById('maxPrice').addEventListener('input', debounce(applyFilters, 500));
+}
+
+async function loadServices(filters = {}) {
+    try {
+        showLoading();
+        
+        const params = new URLSearchParams({
+            page: currentPage,
+            limit: 12,
+            ...filters
+        });
+        
+        const response = await fetch(`/services/api?${params}`);
+        const data = await response.json();
+        
+        if (data.success) {
+            displayServices(data.services);
+            updatePagination(data.pagination);
+            updateResultsInfo(data.pagination);
+        } else {
+            showError('Error loading services');
+        }
+    } catch (error) {
+        console.error('Error loading services:', error);
+        showError('Error loading services');
+    } finally {
+        hideLoading();
+    }
+}
+
+function displayServices(services) {
+    const grid = document.getElementById('servicesGrid');
+    
+    if (services.length === 0) {
+        document.getElementById('noResults').style.display = 'block';
+        grid.innerHTML = '';
+        return;
+    }
+    
+    document.getElementById('noResults').style.display = 'none';
+    
+    grid.innerHTML = services.map(service => `
+        <div class="col-lg-4 col-md-6 mb-4">
+            <div class="service-card">
+                <div class="service-card-header">
+                    <div class="service-category">
+                        <span class="badge bg-primary">${service.category}</span>
+                    </div>
+                    <div class="service-rating">
+                        <i class="fas fa-star text-warning"></i>
+                        <span>${service.rating?.average || 0}</span>
+                        <small class="text-muted">(${service.rating?.count || 0})</small>
+                    </div>
+                </div>
+                
+                <div class="service-card-body">
+                    <h5 class="service-title">${service.title}</h5>
+                    <p class="service-description">${service.description.substring(0, 120)}...</p>
+                    
+                    <div class="service-provider mb-2">
+                        <i class="fas fa-user-circle"></i>
+                        <span>${service.provider?.fullName || 'Unknown Provider'}</span>
+                    </div>
+                    
+                    <div class="service-location mb-2">
+                        <i class="fas fa-map-marker-alt"></i>
+                        <span>${service.serviceArea?.city || 'Location not specified'}</span>
+                    </div>
+                    
+                    <div class="service-duration mb-3">
+                        <i class="fas fa-clock"></i>
+                        <span>${Math.floor(service.duration / 60)}h ${service.duration % 60}m</span>
+                    </div>
+                </div>
+                
+                <div class="service-card-footer">
+                    <div class="service-price">
+                        <span class="price">₹${service.price}</span>
+                        <small class="price-type">${service.priceType === 'hourly' ? '/hour' : service.priceType === 'per-visit' ? '/visit' : ''}</small>
+                    </div>
+                    <button class="btn btn-primary" onclick="viewService('${service._id}')">
+                        View Details
+                    </button>
+                </div>
+            </div>
+        </div>
+    `).join('');
+}
+
+function filterByCategory(category) {
+    currentCategory = category;
+    currentPage = 1;
+    
+    // Update active category
+    document.querySelectorAll('.category-card').forEach(card => {
+        card.classList.remove('active');
+    });
+    document.querySelector(`[data-category="${category}"]`).classList.add('active');
+    
+    // Update title
+    const categoryNames = {
+        cleaning: 'Cleaning Services',
+        ac: 'AC Services',
+        plumbing: 'Plumbing Services',
+        electrical: 'Electrical Services',
+        painting: 'Painting Services',
+        beauty: 'Beauty & Salon Services',
+        appliance: 'Appliance Repair Services',
+        'pest-control': 'Pest Control Services'
+    };
+    
+    document.getElementById('resultsTitle').textContent = categoryNames[category] || 'Services';
+    
+    // Load filtered services
+    loadServices({ category });
+}
+
+function searchServices() {
+    const query = document.getElementById('searchQuery').value;
+    const city = document.getElementById('citySearch').value;
+    
+    currentPage = 1;
+    currentCity = city;
+    
+    const filters = {};
+    if (city) filters.city = city;
+    if (query) filters.search = query;
+    
+    loadServices(filters);
+}
+
+function applyFilters() {
+    const sortBy = document.getElementById('sortBy').value;
+    const minPrice = document.getElementById('minPrice').value;
+    const maxPrice = document.getElementById('maxPrice').value;
+    
+    const filters = {
+        sortBy,
+        ...(currentCategory && { category: currentCategory }),
+        ...(currentCity && { city: currentCity }),
+        ...(minPrice && { minPrice }),
+        ...(maxPrice && { maxPrice })
+    };
+    
+    currentPage = 1;
+    loadServices(filters);
+}
+
+function updatePagination(pagination) {
+    const paginationEl = document.getElementById('pagination');
+    const ul = paginationEl.querySelector('ul');
+    
+    if (pagination.totalPages <= 1) {
+        paginationEl.style.display = 'none';
+        return;
+    }
+    
+    paginationEl.style.display = 'block';
+    
+    let paginationHTML = '';
+    
+    // Previous button
+    paginationHTML += `
+        <li class="page-item ${!pagination.hasPrevPage ? 'disabled' : ''}">
+            <a class="page-link" href="#" onclick="changePage(${pagination.currentPage - 1})">Previous</a>
+        </li>
+    `;
+    
+    // Page numbers
+    const startPage = Math.max(1, pagination.currentPage - 2);
+    const endPage = Math.min(pagination.totalPages, pagination.currentPage + 2);
+    
+    for (let i = startPage; i <= endPage; i++) {
+        paginationHTML += `
+            <li class="page-item ${i === pagination.currentPage ? 'active' : ''}">
+                <a class="page-link" href="#" onclick="changePage(${i})">${i}</a>
+            </li>
+        `;
+    }
+    
+    // Next button
+    paginationHTML += `
+        <li class="page-item ${!pagination.hasNextPage ? 'disabled' : ''}">
+            <a class="page-link" href="#" onclick="changePage(${pagination.currentPage + 1})">Next</a>
+        </li>
+    `;
+    
+    ul.innerHTML = paginationHTML;
+}
+
+function changePage(page) {
+    if (page < 1) return;
+    currentPage = page;
+    applyFilters();
+    window.scrollTo(0, 0);
+}
+
+function updateResultsInfo(pagination) {
+    const countEl = document.getElementById('resultsCount');
+    countEl.textContent = `Showing ${pagination.totalServices} service${pagination.totalServices !== 1 ? 's' : ''}`;
+}
+
+function viewService(serviceId) {
+    window.location.href = `/services/${serviceId}`;
+}
+
+function showLoading() {
+    document.getElementById('loadingIndicator').style.display = 'block';
+    document.getElementById('servicesGrid').style.opacity = '0.5';
+}
+
+function hideLoading() {
+    document.getElementById('loadingIndicator').style.display = 'none';
+    document.getElementById('servicesGrid').style.opacity = '1';
+}
+
+function showError(message) {
+    alert(message); // TODO: Implement proper error display
+}
+
+function debounce(func, wait) {
+    let timeout;
+    return function executedFunction(...args) {
+        const later = () => {
+            clearTimeout(timeout);
+            func(...args);
+        };
+        clearTimeout(timeout);
+        timeout = setTimeout(later, wait);
+    };
+}
+</script>

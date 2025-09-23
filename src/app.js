@@ -3,7 +3,7 @@ const path = require('path');
 const session = require('express-session');
 const MongoStore = require('connect-mongo');
 const connectDB = require('./config/database');
-const { addUserToLocals, isAuthenticated } = require('./middleware/auth');
+const { loadUser, isAuthenticated } = require('./middleware/auth');
 require('dotenv').config();
 
 const app = express();
@@ -39,11 +39,12 @@ const initializeApp = async () => {
             }
         }));
 
-        // Add user to all templates
-        app.use(addUserToLocals);
+        // Load user for all requests
+        app.use(loadUser);
 
         // Routes
         app.use('/auth', require('./routes/auth'));
+        app.use('/services', require('./routes/services'));
 
         // Homepage
         app.get('/', (req, res) => {
@@ -61,11 +62,7 @@ const initializeApp = async () => {
             });
         });
 
-        // Mock routes for testing
-        app.get('/services', (req, res) => {
-            res.json({ message: 'Services page - Coming soon!' });
-        });
-
+        // Temporary routes for development
         app.get('/about', (req, res) => {
             res.json({ message: 'About page - Coming soon!' });
         });
@@ -108,7 +105,5 @@ const initializeApp = async () => {
 
 // Initialize the application
 initializeApp();
-
-module.exports = app;
 
 module.exports = app;

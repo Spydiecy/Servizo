@@ -1,0 +1,419 @@
+<div class="service-details-page">
+    <div class="container py-5">
+        <!-- Back Button -->
+        <div class="mb-4">
+            <button class="btn btn-outline-secondary" onclick="window.history.back()">
+                <i class="fas fa-arrow-left"></i> Back to Services
+            </button>
+        </div>
+
+        <!-- Service Details -->
+        <div id="serviceContent">
+            <!-- Content will be loaded here -->
+        </div>
+
+        <!-- Loading State -->
+        <div id="loadingState" class="text-center py-5">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+            <p class="mt-3">Loading service details...</p>
+        </div>
+
+        <!-- Error State -->
+        <div id="errorState" class="text-center py-5" style="display: none;">
+            <i class="fas fa-exclamation-triangle fa-3x text-warning mb-3"></i>
+            <h4>Service Not Found</h4>
+            <p class="text-muted">The service you're looking for doesn't exist or has been removed.</p>
+            <a href="/services" class="btn btn-primary">Browse All Services</a>
+        </div>
+    </div>
+</div>
+
+<!-- Book Service Modal -->
+<div class="modal fade" id="bookServiceModal" tabindex="-1" aria-labelledby="bookServiceModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="bookServiceModalLabel">Book Service</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="bookingForm">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="bookingDate" class="form-label">Preferred Date</label>
+                        <input type="date" class="form-control" id="bookingDate" name="bookingDate" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="bookingTime" class="form-label">Preferred Time</label>
+                        <select class="form-control" id="bookingTime" name="bookingTime" required>
+                            <option value="">Select Time</option>
+                            <option value="09:00">9:00 AM</option>
+                            <option value="10:00">10:00 AM</option>
+                            <option value="11:00">11:00 AM</option>
+                            <option value="12:00">12:00 PM</option>
+                            <option value="13:00">1:00 PM</option>
+                            <option value="14:00">2:00 PM</option>
+                            <option value="15:00">3:00 PM</option>
+                            <option value="16:00">4:00 PM</option>
+                            <option value="17:00">5:00 PM</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="customerAddress" class="form-label">Service Address</label>
+                        <textarea class="form-control" id="customerAddress" name="customerAddress" rows="3" required placeholder="Enter your complete address"></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label for="specialRequests" class="form-label">Special Requests (Optional)</label>
+                        <textarea class="form-control" id="specialRequests" name="specialRequests" rows="2" placeholder="Any specific requirements or instructions"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Book Service</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+let currentService = null;
+const serviceId = '<%= serviceId %>';
+const currentUser = <%- JSON.stringify(user || null) %>;
+
+// Initialize page
+document.addEventListener('DOMContentLoaded', function() {
+    loadServiceDetails();
+    setupBookingForm();
+});
+
+async function loadServiceDetails() {
+    try {
+        const response = await fetch(`/services/api/${serviceId}`);
+        const data = await response.json();
+        
+        if (data.success) {
+            currentService = data.service;
+            displayServiceDetails(data.service);
+        } else {
+            showError();
+        }
+    } catch (error) {
+        console.error('Error loading service:', error);
+        showError();
+    } finally {
+        document.getElementById('loadingState').style.display = 'none';
+    }
+}
+
+function displayServiceDetails(service) {
+    const content = document.getElementById('serviceContent');
+    
+    content.innerHTML = `
+        <div class="row">
+            <!-- Service Info -->
+            <div class="col-lg-8">
+                <div class="service-header mb-4">
+                    <div class="d-flex justify-content-between align-items-start mb-3">
+                        <div>
+                            <h1 class="service-title">${service.title}</h1>
+                            <div class="service-meta">
+                                <span class="badge bg-primary me-2">${service.category}</span>
+                                ${service.subcategory ? `<span class="badge bg-secondary">${service.subcategory}</span>` : ''}
+                            </div>
+                        </div>
+                        <div class="service-rating text-end">
+                            <div class="rating-stars">
+                                ${generateStars(service.rating?.average || 0)}
+                            </div>
+                            <small class="text-muted">${service.rating?.count || 0} reviews</small>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="service-details-card mb-4">
+                    <h4>Service Description</h4>
+                    <p class="service-description">${service.description}</p>
+                    
+                    ${service.features && service.features.length > 0 ? `
+                        <h5 class="mt-4">What's Included</h5>
+                        <ul class="features-list">
+                            ${service.features.map(feature => `<li><i class="fas fa-check text-success"></i> ${feature}</li>`).join('')}
+                        </ul>
+                    ` : ''}
+                </div>
+
+                <div class="provider-info-card">
+                    <h4>Service Provider</h4>
+                    <div class="provider-details">
+                        <div class="provider-header">
+                            <div class="provider-avatar">
+                                <i class="fas fa-user-circle"></i>
+                            </div>
+                            <div class="provider-info">
+                                <h6>${service.provider?.fullName || 'Unknown Provider'}</h6>
+                                <p class="text-muted mb-1">${service.provider?.email || ''}</p>
+                                <p class="text-muted">${service.provider?.phone || ''}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Booking Sidebar -->
+            <div class="col-lg-4">
+                <div class="booking-card sticky-top">
+                    <div class="price-section">
+                        <div class="price-display">
+                            <span class="current-price">₹${service.price}</span>
+                            <span class="price-type">${service.priceType === 'hourly' ? '/hour' : service.priceType === 'per-visit' ? '/visit' : ''}</span>
+                        </div>
+                    </div>
+
+                    <div class="service-info">
+                        <div class="info-item">
+                            <i class="fas fa-clock"></i>
+                            <span>Duration: ${Math.floor(service.duration / 60)}h ${service.duration % 60}m</span>
+                        </div>
+                        <div class="info-item">
+                            <i class="fas fa-map-marker-alt"></i>
+                            <span>Available in: ${service.serviceArea?.city || 'Location not specified'}</span>
+                        </div>
+                        <div class="info-item">
+                            <i class="fas fa-calendar-check"></i>
+                            <span>Bookings: ${service.bookingCount || 0}</span>
+                        </div>
+                    </div>
+
+                    <div class="booking-actions">
+                        ${currentUser ? `
+                            ${currentUser.userType === 'customer' ? `
+                                <button class="btn btn-primary w-100 mb-3" onclick="showBookingModal()">
+                                    <i class="fas fa-calendar-plus"></i> Book Now
+                                </button>
+                            ` : `
+                                <p class="text-muted text-center">Service providers cannot book services</p>
+                            `}
+                        ` : `
+                            <a href="/auth/login" class="btn btn-primary w-100 mb-3">
+                                <i class="fas fa-sign-in-alt"></i> Login to Book
+                            </a>
+                        `}
+                        
+                        <button class="btn btn-outline-primary w-100" onclick="contactProvider()">
+                            <i class="fas fa-phone"></i> Contact Provider
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    content.style.display = 'block';
+}
+
+function generateStars(rating) {
+    const fullStars = Math.floor(rating);
+    const hasHalfStar = rating % 1 !== 0;
+    const emptyStars = 5 - fullStars - (hasHalfStar ? 1 : 0);
+    
+    let starsHTML = '';
+    
+    // Full stars
+    for (let i = 0; i < fullStars; i++) {
+        starsHTML += '<i class="fas fa-star text-warning"></i>';
+    }
+    
+    // Half star
+    if (hasHalfStar) {
+        starsHTML += '<i class="fas fa-star-half-alt text-warning"></i>';
+    }
+    
+    // Empty stars
+    for (let i = 0; i < emptyStars; i++) {
+        starsHTML += '<i class="far fa-star text-warning"></i>';
+    }
+    
+    return starsHTML;
+}
+
+function showBookingModal() {
+    if (!currentService) return;
+    
+    // Set minimum date to today
+    const today = new Date().toISOString().split('T')[0];
+    document.getElementById('bookingDate').setAttribute('min', today);
+    
+    const modal = new bootstrap.Modal(document.getElementById('bookServiceModal'));
+    modal.show();
+}
+
+function setupBookingForm() {
+    document.getElementById('bookingForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        const formData = new FormData(this);
+        const bookingData = {
+            serviceId: serviceId,
+            bookingDate: formData.get('bookingDate'),
+            bookingTime: formData.get('bookingTime'),
+            customerAddress: formData.get('customerAddress'),
+            specialRequests: formData.get('specialRequests')
+        };
+        
+        try {
+            // TODO: Implement booking API
+            alert('Booking functionality will be implemented soon!');
+            
+            const modal = bootstrap.Modal.getInstance(document.getElementById('bookServiceModal'));
+            modal.hide();
+            this.reset();
+        } catch (error) {
+            console.error('Error creating booking:', error);
+            alert('Error creating booking');
+        }
+    });
+}
+
+function contactProvider() {
+    if (!currentService?.provider?.phone) {
+        alert('Provider contact information not available');
+        return;
+    }
+    
+    const phone = currentService.provider.phone;
+    const message = `Hi, I'm interested in your service: ${currentService.title}`;
+    const whatsappUrl = `https://wa.me/${phone.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(message)}`;
+    
+    window.open(whatsappUrl, '_blank');
+}
+
+function showError() {
+    document.getElementById('errorState').style.display = 'block';
+}
+</script>
+
+<style>
+.service-details-page {
+    min-height: 60vh;
+}
+
+.service-title {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--dark-color);
+    margin-bottom: 0.5rem;
+}
+
+.service-meta {
+    margin-bottom: 1rem;
+}
+
+.service-details-card,
+.provider-info-card {
+    background: white;
+    border-radius: var(--border-radius);
+    padding: 2rem;
+    box-shadow: var(--shadow-sm);
+    border: 1px solid #e2e8f0;
+}
+
+.service-description {
+    font-size: 1.1rem;
+    line-height: 1.7;
+    color: var(--secondary-color);
+}
+
+.features-list {
+    list-style: none;
+    padding: 0;
+}
+
+.features-list li {
+    padding: 0.5rem 0;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.provider-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.provider-avatar {
+    font-size: 3rem;
+    color: var(--primary-color);
+}
+
+.booking-card {
+    background: white;
+    border-radius: var(--border-radius);
+    padding: 2rem;
+    box-shadow: var(--shadow-md);
+    border: 1px solid #e2e8f0;
+    top: 100px;
+}
+
+.price-display {
+    text-align: center;
+    padding: 1.5rem 0;
+    border-bottom: 1px solid #f1f5f9;
+    margin-bottom: 1.5rem;
+}
+
+.current-price {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--primary-color);
+}
+
+.price-type {
+    font-size: 0.9rem;
+    color: var(--secondary-color);
+    margin-left: 0.25rem;
+}
+
+.service-info {
+    margin-bottom: 2rem;
+}
+
+.info-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem 0;
+    border-bottom: 1px solid #f8f9fa;
+}
+
+.info-item:last-child {
+    border-bottom: none;
+}
+
+.info-item i {
+    color: var(--primary-color);
+    width: 16px;
+}
+
+.rating-stars {
+    margin-bottom: 0.25rem;
+}
+
+@media (max-width: 768px) {
+    .service-title {
+        font-size: 1.5rem;
+    }
+    
+    .booking-card {
+        position: static !important;
+        margin-top: 2rem;
+    }
+    
+    .service-details-card,
+    .provider-info-card {
+        padding: 1.5rem;
+    }
+}
+</style>

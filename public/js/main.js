@@ -524,3 +524,29 @@ window.ServizoApp = {
     isTablet,
     isDesktop
 };
+
+// ===== AUTHENTICATION FUNCTIONS =====
+async function logoutUser() {
+    try {
+        const response = await fetch('/auth/logout', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        });
+        
+        if (response.ok) {
+            // Redirect to home page
+            window.location.href = '/';
+        } else {
+            console.error('Logout failed');
+            alert('Error logging out. Please try again.');
+        }
+    } catch (error) {
+        console.error('Logout error:', error);
+        alert('Error logging out. Please try again.');
+    }
+}
+
+// Make logout function globally available
+window.logoutUser = logoutUser;
