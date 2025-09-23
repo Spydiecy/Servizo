@@ -45,6 +45,7 @@ const initializeApp = async () => {
         // Routes
         app.use('/auth', require('./routes/auth'));
         app.use('/services', require('./routes/services'));
+        app.use('/bookings', require('./routes/bookings'));
 
         // Homepage
         app.get('/', (req, res) => {
@@ -69,10 +70,6 @@ const initializeApp = async () => {
 
         app.get('/contact', (req, res) => {
             res.json({ message: 'Contact page - Coming soon!' });
-        });
-
-        app.get('/bookings', isAuthenticated, (req, res) => {
-            res.json({ message: 'Bookings page - Coming soon!' });
         });
 
         app.get('/profile', isAuthenticated, (req, res) => {

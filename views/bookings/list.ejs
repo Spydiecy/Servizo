@@ -1,0 +1,565 @@
+<div class="bookings-page">
+    <div class="container py-4">
+        <!-- Header -->
+        <div class="row mb-4">
+            <div class="col-md-8">
+                <h2 id="pageTitle">
+                    <% if (user.userType === 'customer') { %>
+                        My Bookings
+                    <% } else { %>
+                        Manage Bookings
+                    <% } %>
+                </h2>
+                <p class="text-muted" id="pageSubtitle">
+                    <% if (user.userType === 'customer') { %>
+                        Track and manage your service bookings
+                    <% } else { %>
+                        Manage customer bookings for your services
+                    <% } %>
+                </p>
+            </div>
+            <div class="col-md-4">
+                <div class="filters">
+                    <select class="form-control" id="statusFilter">
+                        <option value="all">All Bookings</option>
+                        <option value="pending">Pending</option>
+                        <option value="confirmed">Confirmed</option>
+                        <option value="in-progress">In Progress</option>
+                        <option value="completed">Completed</option>
+                        <option value="cancelled">Cancelled</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <!-- Stats Cards -->
+        <div class="row mb-4" id="statsCards">
+            <!-- Stats will be loaded here -->
+        </div>
+
+        <!-- Bookings List -->
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-body">
+                        <div id="bookingsList">
+                            <!-- Bookings will be loaded here -->
+                        </div>
+                        
+                        <!-- Loading indicator -->
+                        <div id="loadingIndicator" class="text-center py-4">
+                            <div class="spinner-border text-primary" role="status">
+                                <span class="visually-hidden">Loading...</span>
+                            </div>
+                            <p class="mt-2">Loading bookings...</p>
+                        </div>
+                        
+                        <!-- No bookings message -->
+                        <div id="noBookings" class="text-center py-5" style="display: none;">
+                            <i class="fas fa-calendar-times fa-3x text-muted mb-3"></i>
+                            <h4>No Bookings Found</h4>
+                            <p class="text-muted">
+                                <% if (user.userType === 'customer') { %>
+                                    You haven't made any bookings yet. <a href="/services">Browse services</a> to get started.
+                                <% } else { %>
+                                    No bookings received yet. Make sure your services are active and visible.
+                                <% } %>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Update Status Modal (for providers) -->
+<% if (user.userType === 'provider') { %>
+<div class="modal fade" id="updateStatusModal" tabindex="-1" aria-labelledby="updateStatusModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="updateStatusModalLabel">Update Booking Status</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="updateStatusForm">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="newStatus" class="form-label">New Status</label>
+                        <select class="form-control" id="newStatus" name="status" required>
+                            <option value="confirmed">Confirm Booking</option>
+                            <option value="in-progress">Mark In Progress</option>
+                            <option value="completed">Mark Completed</option>
+                            <option value="rejected">Reject Booking</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="statusNotes" class="form-label">Notes (Optional)</label>
+                        <textarea class="form-control" id="statusNotes" name="notes" rows="3" placeholder="Add any notes or comments"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Update Status</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<% } %>
+
+<!-- Cancel Booking Modal (for customers) -->
+<% if (user.userType === 'customer') { %>
+<div class="modal fade" id="cancelBookingModal" tabindex="-1" aria-labelledby="cancelBookingModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="cancelBookingModalLabel">Cancel Booking</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="cancelBookingForm">
+                <div class="modal-body">
+                    <p>Are you sure you want to cancel this booking?</p>
+                    <div class="mb-3">
+                        <label for="cancellationReason" class="form-label">Reason for cancellation</label>
+                        <textarea class="form-control" id="cancellationReason" name="reason" rows="3" required placeholder="Please provide a reason for cancellation"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Keep Booking</button>
+                    <button type="submit" class="btn btn-danger">Cancel Booking</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<% } %>
+
+<script>
+const userType = '<%= user.userType %>';
+const isProvider = userType === 'provider';
+const isCustomer = userType === 'customer';
+let currentBookingId = null;
+
+// Initialize page
+document.addEventListener('DOMContentLoaded', function() {
+    loadBookings();
+    setupEventListeners();
+});
+
+function setupEventListeners() {
+    // Status filter
+    document.getElementById('statusFilter').addEventListener('change', function() {
+        loadBookings(this.value);
+    });
+    
+    // Forms - only add listeners if elements exist
+    if (isProvider && document.getElementById('updateStatusForm')) {
+        document.getElementById('updateStatusForm').addEventListener('submit', handleStatusUpdate);
+    }
+    
+    if (isCustomer && document.getElementById('cancelBookingForm')) {
+        document.getElementById('cancelBookingForm').addEventListener('submit', handleBookingCancel);
+    }
+}
+
+async function loadBookings(status = 'all') {
+    try {
+        showLoading();
+        
+        const params = new URLSearchParams();
+        if (status !== 'all') params.append('status', status);
+        
+        const response = await fetch(`/bookings/api?${params}`);
+        const data = await response.json();
+        
+        if (data.success) {
+            displayBookings(data.bookings);
+            updateStats(data.bookings);
+        } else {
+            showError('Error loading bookings');
+        }
+    } catch (error) {
+        console.error('Error loading bookings:', error);
+        showError('Error loading bookings');
+    } finally {
+        hideLoading();
+    }
+}
+
+function displayBookings(bookings) {
+    const container = document.getElementById('bookingsList');
+    
+    if (bookings.length === 0) {
+        document.getElementById('noBookings').style.display = 'block';
+        container.innerHTML = '';
+        return;
+    }
+    
+    document.getElementById('noBookings').style.display = 'none';
+    
+    container.innerHTML = bookings.map(booking => `
+        <div class="booking-card mb-3">
+            <div class="row">
+                <div class="col-lg-8">
+                    <div class="booking-info">
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                            <h5 class="booking-title">${booking.service?.title || 'Service'}</h5>
+                            <span class="badge ${getStatusBadgeClass(booking.status)}">${booking.formattedStatus}</span>
+                        </div>
+                        
+                        <p class="booking-description text-muted">${booking.service?.description?.substring(0, 120)}...</p>
+                        
+                        <div class="booking-details">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="detail-item">
+                                        <i class="fas fa-calendar"></i>
+                                        <span>${booking.formattedDateTime}</span>
+                                    </div>
+                                    <div class="detail-item">
+                                        <i class="fas fa-map-marker-alt"></i>
+                                        <span>${booking.customerAddress}</span>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="detail-item">
+                                        <i class="fas fa-user"></i>
+                                        <span>${userType === 'customer' ? 
+                                            (booking.provider?.fullName || 'Provider') : 
+                                            (booking.customer?.fullName || 'Customer')}</span>
+                                    </div>
+                                    <div class="detail-item">
+                                        <i class="fas fa-rupee-sign"></i>
+                                        <span>₹${booking.totalAmount}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        ${booking.specialRequests ? `
+                            <div class="special-requests mt-2">
+                                <strong>Special Requests:</strong> ${booking.specialRequests}
+                            </div>
+                        ` : ''}
+                    </div>
+                </div>
+                <div class="col-lg-4">
+                    <div class="booking-actions">
+                        ${generateActionButtons(booking)}
+                    </div>
+                </div>
+            </div>
+        </div>
+    `).join('');
+}
+
+function generateActionButtons(booking) {
+    const buttons = [];
+    
+    if (userType === 'provider') {
+        if (booking.status === 'pending') {
+            buttons.push(`
+                <button class="btn btn-success btn-sm me-2" onclick="updateBookingStatus('${booking._id}', 'confirmed')">
+                    <i class="fas fa-check"></i> Confirm
+                </button>
+                <button class="btn btn-danger btn-sm" onclick="updateBookingStatus('${booking._id}', 'rejected')">
+                    <i class="fas fa-times"></i> Reject
+                </button>
+            `);
+        } else if (booking.status === 'confirmed') {
+            buttons.push(`
+                <button class="btn btn-primary btn-sm" onclick="updateBookingStatus('${booking._id}', 'in-progress')">
+                    <i class="fas fa-play"></i> Start Service
+                </button>
+            `);
+        } else if (booking.status === 'in-progress') {
+            buttons.push(`
+                <button class="btn btn-success btn-sm" onclick="updateBookingStatus('${booking._id}', 'completed')">
+                    <i class="fas fa-check-circle"></i> Mark Complete
+                </button>
+            `);
+        }
+        
+        if (['pending', 'confirmed'].includes(booking.status)) {
+            buttons.push(`
+                <button class="btn btn-outline-secondary btn-sm mt-2" onclick="showUpdateStatusModal('${booking._id}')">
+                    <i class="fas fa-edit"></i> Update Status
+                </button>
+            `);
+        }
+    } else {
+        // Customer actions
+        if (['pending', 'confirmed'].includes(booking.status)) {
+            buttons.push(`
+                <button class="btn btn-outline-danger btn-sm" onclick="showCancelModal('${booking._id}')">
+                    <i class="fas fa-times"></i> Cancel Booking
+                </button>
+            `);
+        }
+        
+        if (booking.provider?.phone) {
+            buttons.push(`
+                <button class="btn btn-outline-primary btn-sm mt-2" onclick="contactProvider('${booking.provider.phone}', '${booking.service?.title}')">
+                    <i class="fas fa-phone"></i> Contact Provider
+                </button>
+            `);
+        }
+    }
+    
+    return buttons.join('');
+}
+
+function getStatusBadgeClass(status) {
+    const classes = {
+        'pending': 'bg-warning',
+        'confirmed': 'bg-info',
+        'in-progress': 'bg-primary',
+        'completed': 'bg-success',
+        'cancelled': 'bg-secondary',
+        'rejected': 'bg-danger'
+    };
+    return classes[status] || 'bg-secondary';
+}
+
+function updateStats(bookings) {
+    const stats = {
+        total: bookings.length,
+        pending: bookings.filter(b => b.status === 'pending').length,
+        confirmed: bookings.filter(b => b.status === 'confirmed').length,
+        completed: bookings.filter(b => b.status === 'completed').length
+    };
+    
+    const statsContainer = document.getElementById('statsCards');
+    statsContainer.innerHTML = `
+        <div class="col-md-3">
+            <div class="stat-card">
+                <div class="stat-value">${stats.total}</div>
+                <div class="stat-label">Total Bookings</div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stat-card">
+                <div class="stat-value">${stats.pending}</div>
+                <div class="stat-label">Pending</div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stat-card">
+                <div class="stat-value">${stats.confirmed}</div>
+                <div class="stat-label">Confirmed</div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stat-card">
+                <div class="stat-value">${stats.completed}</div>
+                <div class="stat-label">Completed</div>
+            </div>
+        </div>
+    `;
+}
+
+async function updateBookingStatus(bookingId, status) {
+    try {
+        const response = await fetch(`/bookings/${bookingId}/status`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ status })
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            alert('Booking status updated successfully!');
+            loadBookings();
+        } else {
+            alert('Error updating booking: ' + data.message);
+        }
+    } catch (error) {
+        console.error('Error updating booking:', error);
+        alert('Error updating booking');
+    }
+}
+
+function showUpdateStatusModal(bookingId) {
+    currentBookingId = bookingId;
+    const modal = new bootstrap.Modal(document.getElementById('updateStatusModal'));
+    modal.show();
+}
+
+function showCancelModal(bookingId) {
+    currentBookingId = bookingId;
+    const modal = new bootstrap.Modal(document.getElementById('cancelBookingModal'));
+    modal.show();
+}
+
+async function handleStatusUpdate(e) {
+    e.preventDefault();
+    
+    const formData = new FormData(e.target);
+    const updateData = {
+        status: formData.get('status'),
+        notes: formData.get('notes')
+    };
+    
+    try {
+        const response = await fetch(`/bookings/${currentBookingId}/status`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(updateData)
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            alert('Booking status updated successfully!');
+            const modal = bootstrap.Modal.getInstance(document.getElementById('updateStatusModal'));
+            modal.hide();
+            e.target.reset();
+            loadBookings();
+        } else {
+            alert('Error updating booking: ' + data.message);
+        }
+    } catch (error) {
+        console.error('Error updating booking:', error);
+        alert('Error updating booking');
+    }
+}
+
+async function handleBookingCancel(e) {
+    e.preventDefault();
+    
+    const formData = new FormData(e.target);
+    const cancelData = {
+        reason: formData.get('reason')
+    };
+    
+    try {
+        const response = await fetch(`/bookings/${currentBookingId}/cancel`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(cancelData)
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            alert('Booking cancelled successfully!');
+            const modal = bootstrap.Modal.getInstance(document.getElementById('cancelBookingModal'));
+            modal.hide();
+            e.target.reset();
+            loadBookings();
+        } else {
+            alert('Error cancelling booking: ' + data.message);
+        }
+    } catch (error) {
+        console.error('Error cancelling booking:', error);
+        alert('Error cancelling booking');
+    }
+}
+
+function contactProvider(phone, serviceName) {
+    const message = `Hi, I have a booking for ${serviceName}. I wanted to discuss the details.`;
+    const whatsappUrl = `https://wa.me/${phone.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(message)}`;
+    window.open(whatsappUrl, '_blank');
+}
+
+function showLoading() {
+    document.getElementById('loadingIndicator').style.display = 'block';
+}
+
+function hideLoading() {
+    document.getElementById('loadingIndicator').style.display = 'none';
+}
+
+function showError(message) {
+    alert(message); // TODO: Implement proper error display
+}
+</script>
+
+<style>
+.booking-card {
+    background: white;
+    border-radius: var(--border-radius);
+    padding: 1.5rem;
+    box-shadow: var(--shadow-sm);
+    border: 1px solid #e2e8f0;
+}
+
+.booking-title {
+    color: var(--dark-color);
+    margin-bottom: 0.5rem;
+}
+
+.booking-description {
+    font-size: 0.95rem;
+    line-height: 1.5;
+}
+
+.detail-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.75rem;
+    font-size: 0.9rem;
+}
+
+.detail-item i {
+    color: var(--primary-color);
+    width: 16px;
+}
+
+.special-requests {
+    background: #f8f9fa;
+    padding: 0.75rem;
+    border-radius: 6px;
+    font-size: 0.9rem;
+}
+
+.booking-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.stat-card {
+    background: white;
+    border-radius: var(--border-radius);
+    padding: 1.5rem;
+    text-align: center;
+    box-shadow: var(--shadow-sm);
+    border: 1px solid #e2e8f0;
+}
+
+.stat-value {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--primary-color);
+}
+
+.stat-label {
+    color: var(--secondary-color);
+    font-size: 0.9rem;
+    margin-top: 0.25rem;
+}
+
+@media (max-width: 768px) {
+    .booking-card {
+        padding: 1rem;
+    }
+    
+    .booking-actions {
+        margin-top: 1rem;
+    }
+    
+    .detail-item {
+        font-size: 0.85rem;
+    }
+}
+</style>

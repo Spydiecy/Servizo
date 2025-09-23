@@ -17,14 +17,14 @@
                     <nav class="sidebar-nav">
                         <ul class="nav flex-column">
                             <li class="nav-item">
-                                <a class="nav-link active" href="/dashboard">
+                                <a class="nav-link active" href="#" onclick="event.preventDefault(); showDashboardTab(); return false;">
                                     <i class="fas fa-tachometer-alt"></i>
                                     Dashboard
                                 </a>
                             </li>
                             <% if (user.userType === 'customer') { %>
                                 <li class="nav-item">
-                                    <a class="nav-link" href="/bookings">
+                                    <a class="nav-link" href="#" onclick="event.preventDefault(); showBookingsTab(); return false;">
                                         <i class="fas fa-calendar-check"></i>
                                         My Bookings
                                     </a>
@@ -37,30 +37,18 @@
                                 </li>
                             <% } else { %>
                                 <li class="nav-item">
-                                    <a class="nav-link" href="/my-services">
+                                    <a class="nav-link" href="#" onclick="event.preventDefault(); showMyServicesTab(); return false;">
                                         <i class="fas fa-tools"></i>
                                         My Services
                                     </a>
                                 </li>
                                 <li class="nav-item">
-                                    <a class="nav-link" href="/bookings/manage">
+                                    <a class="nav-link" href="#" onclick="event.preventDefault(); showBookingsTab(); return false;">
                                         <i class="fas fa-calendar-alt"></i>
                                         Manage Bookings
                                     </a>
                                 </li>
-                                <li class="nav-item">
-                                    <a class="nav-link" href="/earnings">
-                                        <i class="fas fa-chart-line"></i>
-                                        Earnings
-                                    </a>
-                                </li>
                             <% } %>
-                            <li class="nav-item">
-                                <a class="nav-link" href="/profile">
-                                    <i class="fas fa-user-cog"></i>
-                                    Profile Settings
-                                </a>
-                            </li>
                             <li class="nav-item mt-3">
                                 <a class="nav-link text-danger" href="#" onclick="logout()">
                                     <i class="fas fa-sign-out-alt"></i>
@@ -131,7 +119,7 @@
                 </div>
                 
                 <!-- Quick Actions -->
-                <div class="row">
+                <div id="dashboardTab" class="row">
                     <div class="col-12">
                         <div class="card">
                             <div class="card-header">
@@ -150,7 +138,7 @@
                                             </a>
                                         </div>
                                         <div class="col-md-4 mb-3">
-                                            <a href="/bookings" class="action-card">
+                                            <a href="#" class="action-card" onclick="event.preventDefault(); showBookingsTab(); return false;">
                                                 <div class="action-icon">
                                                     <i class="fas fa-calendar-check"></i>
                                                 </div>
@@ -158,21 +146,12 @@
                                                 <p>View your service bookings</p>
                                             </a>
                                         </div>
-                                        <div class="col-md-4 mb-3">
-                                            <a href="/profile" class="action-card">
-                                                <div class="action-icon">
-                                                    <i class="fas fa-user-edit"></i>
-                                                </div>
-                                                <h6>Update Profile</h6>
-                                                <p>Edit your account information</p>
-                                            </a>
-                                        </div>
                                     </div>
                                 <% } else { %>
                                     <!-- Service Provider Actions -->
                                     <div class="row">
                                         <div class="col-md-4 mb-3">
-                                            <a href="#" class="action-card" onclick="showCreateServiceModal()">
+                                            <a href="#" class="action-card" onclick="event.preventDefault(); showCreateServiceModal(); return false;">
                                                 <div class="action-icon">
                                                     <i class="fas fa-plus"></i>
                                                 </div>
@@ -181,7 +160,7 @@
                                             </a>
                                         </div>
                                         <div class="col-md-4 mb-3">
-                                            <a href="#" class="action-card" onclick="loadMyServices()">
+                                            <a href="#" class="action-card" onclick="event.preventDefault(); showMyServicesTab(); return false;">
                                                 <div class="action-icon">
                                                     <i class="fas fa-tools"></i>
                                                 </div>
@@ -190,7 +169,7 @@
                                             </a>
                                         </div>
                                         <div class="col-md-4 mb-3">
-                                            <a href="/bookings/manage" class="action-card">
+                                            <a href="#" class="action-card" onclick="event.preventDefault(); showBookingsTab(); return false;">
                                                 <div class="action-icon">
                                                     <i class="fas fa-calendar-alt"></i>
                                                 </div>
@@ -213,6 +192,86 @@
                                         </div>
                                     </div>
                                 <% } %>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Bookings Tab -->
+                <div id="bookingsTab" class="row" style="display: none;">
+                    <div class="col-12">
+                        <div class="card">
+                            <div class="card-header">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <h5 class="card-title mb-0">
+                                        <% if (user.userType === 'customer') { %>
+                                            My Bookings
+                                        <% } else { %>
+                                            Manage Bookings
+                                        <% } %>
+                                    </h5>
+                                    <select class="form-control" id="statusFilter" style="width: auto;">
+                                        <option value="all">All Bookings</option>
+                                        <option value="pending">Pending</option>
+                                        <option value="confirmed">Confirmed</option>
+                                        <option value="in-progress">In Progress</option>
+                                        <option value="completed">Completed</option>
+                                        <option value="cancelled">Cancelled</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                <!-- Stats Cards -->
+                                <div class="row mb-4" id="statsCards">
+                                    <!-- Stats will be loaded here -->
+                                </div>
+
+                                <!-- Bookings List -->
+                                <div id="bookingsList">
+                                    <!-- Bookings will be loaded here -->
+                                </div>
+                                
+                                <!-- Loading indicator -->
+                                <div id="loadingIndicator" class="text-center py-4" style="display: none;">
+                                    <div class="spinner-border text-primary" role="status">
+                                        <span class="visually-hidden">Loading...</span>
+                                    </div>
+                                    <p class="mt-2">Loading bookings...</p>
+                                </div>
+                                
+                                <!-- No bookings message -->
+                                <div id="noBookings" class="text-center py-5" style="display: none;">
+                                    <i class="fas fa-calendar-times fa-3x text-muted mb-3"></i>
+                                    <h4>No Bookings Found</h4>
+                                    <p class="text-muted">
+                                        <% if (user.userType === 'customer') { %>
+                                            You haven't made any bookings yet. <a href="/services">Browse services</a> to get started.
+                                        <% } else { %>
+                                            No bookings received yet. Make sure your services are active and visible.
+                                        <% } %>
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- My Services Tab -->
+                <div id="myServicesTab" class="row" style="display: none;">
+                    <div class="col-12">
+                        <div class="card">
+                            <div class="card-header">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <h5 class="card-title mb-0">My Services</h5>
+                                    <button class="btn btn-primary" onclick="showCreateServiceModal()">
+                                        <i class="fas fa-plus"></i> Add New Service
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                <div id="myServicesTabList" class="row">
+                                    <!-- Services will be loaded here -->
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -325,21 +384,376 @@
 </div>
 
 <script>
-// Service Management Functions
-async function showCreateServiceModal() {
+const userType = '<%= user.userType %>';
+let currentBookingId = null;
+
+// Tab management
+function showDashboardTab() {
+    console.log('showDashboardTab called');
+    try {
+        // Hide all tabs
+        document.getElementById('dashboardTab').style.display = 'block';
+        document.getElementById('bookingsTab').style.display = 'none';
+        document.getElementById('myServicesTab').style.display = 'none';
+        
+        // Update navigation
+        updateActiveNavLink('dashboard');
+        console.log('showDashboardTab completed');
+    } catch (error) {
+        console.error('Error in showDashboardTab:', error);
+    }
+}
+
+function showBookingsTab() {
+    try {
+        console.log('showBookingsTab called');
+        
+        // Hide all tabs
+        const dashboardTab = document.getElementById('dashboardTab');
+        const bookingsTab = document.getElementById('bookingsTab');
+        const myServicesTab = document.getElementById('myServicesTab');
+        
+        if (dashboardTab) dashboardTab.style.display = 'none';
+        if (bookingsTab) bookingsTab.style.display = 'block';
+        if (myServicesTab) myServicesTab.style.display = 'none';
+        
+        // Update navigation and load bookings
+        updateActiveNavLink('bookings');
+        loadBookings();
+        setupBookingEventListeners();
+        
+        console.log('showBookingsTab completed');
+    } catch (error) {
+        console.error('Error in showBookingsTab:', error);
+    }
+}
+
+function showMyServicesTab() {
+    console.log('showMyServicesTab called');
+    try {
+        // Hide all tabs
+        document.getElementById('dashboardTab').style.display = 'none';
+        document.getElementById('bookingsTab').style.display = 'none';
+        document.getElementById('myServicesTab').style.display = 'block';
+        
+        // Update navigation and load services
+        updateActiveNavLink('services');
+        loadMyServices();
+        console.log('showMyServicesTab completed');
+    } catch (error) {
+        console.error('Error in showMyServicesTab:', error);
+    }
+}
+
+function updateActiveNavLink(activeTab) {
+    // Remove active class from all nav links
+    document.querySelectorAll('.nav-link').forEach(link => {
+        link.classList.remove('active');
+    });
+    
+    // Add active class to current tab - simplified for now
+    // You can enhance this to properly match the clicked link
+}
+
+// Bookings functionality
+async function loadBookings(status = 'all') {
+    try {
+        showLoading();
+        
+        const params = new URLSearchParams();
+        if (status !== 'all') params.append('status', status);
+        
+        const response = await fetch(`/bookings/api?${params}`);
+        const data = await response.json();
+        
+        if (data.success) {
+            displayBookings(data.bookings);
+            updateStats(data.bookings);
+        } else {
+            showError('Error loading bookings');
+        }
+    } catch (error) {
+        console.error('Error loading bookings:', error);
+        showError('Error loading bookings');
+    } finally {
+        hideLoading();
+    }
+}
+
+function displayBookings(bookings) {
+    const container = document.getElementById('bookingsList');
+    
+    if (bookings.length === 0) {
+        document.getElementById('noBookings').style.display = 'block';
+        container.innerHTML = '';
+        return;
+    }
+    
+    document.getElementById('noBookings').style.display = 'none';
+    
+    container.innerHTML = bookings.map(booking => `
+        <div class="booking-card mb-3">
+            <div class="row">
+                <div class="col-lg-8">
+                    <div class="booking-info">
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                            <h5 class="booking-title">${booking.service?.title || 'Service'}</h5>
+                            <span class="badge ${getStatusBadgeClass(booking.status)}">${booking.formattedStatus || booking.status}</span>
+                        </div>
+                        
+                        <p class="booking-description text-muted">${booking.service?.description?.substring(0, 120) || ''}...</p>
+                        
+                        <div class="booking-details">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="detail-item">
+                                        <i class="fas fa-calendar"></i>
+                                        <span>${formatDateTime(booking.bookingDate, booking.bookingTime)}</span>
+                                    </div>
+                                    <div class="detail-item">
+                                        <i class="fas fa-map-marker-alt"></i>
+                                        <span>${booking.customerAddress}</span>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="detail-item">
+                                        <i class="fas fa-user"></i>
+                                        <span>${getContactName(booking)}</span>
+                                    </div>
+                                    <div class="detail-item">
+                                        <i class="fas fa-rupee-sign"></i>
+                                        <span>₹${booking.totalAmount}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        ${booking.specialRequests ? `
+                            <div class="special-requests mt-2">
+                                <strong>Special Requests:</strong> ${booking.specialRequests}
+                            </div>
+                        ` : ''}
+                    </div>
+                </div>
+                <div class="col-lg-4">
+                    <div class="booking-actions">
+                        ${generateActionButtons(booking)}
+                    </div>
+                </div>
+            </div>
+        </div>
+    `).join('');
+}
+
+function getContactName(booking) {
+    if (userType === 'customer') {
+        // Customer sees provider name
+        const provider = booking.provider;
+        if (provider && provider.firstName && provider.lastName) {
+            return `${provider.firstName} ${provider.lastName}`;
+        }
+        return provider?.fullName || 'Provider';
+    } else {
+        // Provider sees customer name
+        const customer = booking.customer;
+        if (customer && customer.firstName && customer.lastName) {
+            return `${customer.firstName} ${customer.lastName}`;
+        }
+        return customer?.fullName || 'Customer';
+    }
+}
+
+function formatDateTime(date, time) {
+    const bookingDate = new Date(date);
+    const formattedDate = bookingDate.toLocaleDateString();
+    return `${formattedDate} ${time}`;
+}
+
+function generateActionButtons(booking) {
+    const buttons = [];
+    
+    if (userType === 'provider') {
+        if (booking.status === 'pending') {
+            buttons.push(`
+                <button class="btn btn-success btn-sm me-2" onclick="updateBookingStatus('${booking._id}', 'confirmed')">
+                    <i class="fas fa-check"></i> Confirm
+                </button>
+                <button class="btn btn-danger btn-sm" onclick="updateBookingStatus('${booking._id}', 'rejected')">
+                    <i class="fas fa-times"></i> Reject
+                </button>
+            `);
+        } else if (booking.status === 'confirmed') {
+            buttons.push(`
+                <button class="btn btn-primary btn-sm" onclick="updateBookingStatus('${booking._id}', 'in-progress')">
+                    <i class="fas fa-play"></i> Start Service
+                </button>
+            `);
+        } else if (booking.status === 'in-progress') {
+            buttons.push(`
+                <button class="btn btn-success btn-sm" onclick="updateBookingStatus('${booking._id}', 'completed')">
+                    <i class="fas fa-check-circle"></i> Mark Complete
+                </button>
+            `);
+        }
+    } else {
+        // Customer actions
+        if (['pending', 'confirmed'].includes(booking.status)) {
+            buttons.push(`
+                <button class="btn btn-outline-danger btn-sm" onclick="cancelBooking('${booking._id}')">
+                    <i class="fas fa-times"></i> Cancel Booking
+                </button>
+            `);
+        }
+    }
+    
+    return buttons.join('');
+}
+
+function getStatusBadgeClass(status) {
+    const classes = {
+        'pending': 'bg-warning',
+        'confirmed': 'bg-info',
+        'in-progress': 'bg-primary',
+        'completed': 'bg-success',
+        'cancelled': 'bg-secondary',
+        'rejected': 'bg-danger'
+    };
+    return classes[status] || 'bg-secondary';
+}
+
+function updateStats(bookings) {
+    const stats = {
+        total: bookings.length,
+        pending: bookings.filter(b => b.status === 'pending').length,
+        confirmed: bookings.filter(b => b.status === 'confirmed').length,
+        completed: bookings.filter(b => b.status === 'completed').length
+    };
+    
+    const statsContainer = document.getElementById('statsCards');
+    statsContainer.innerHTML = `
+        <div class="col-md-3">
+            <div class="stat-card">
+                <div class="stat-value">${stats.total}</div>
+                <div class="stat-label">Total Bookings</div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stat-card">
+                <div class="stat-value">${stats.pending}</div>
+                <div class="stat-label">Pending</div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stat-card">
+                <div class="stat-value">${stats.confirmed}</div>
+                <div class="stat-label">Confirmed</div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stat-card">
+                <div class="stat-value">${stats.completed}</div>
+                <div class="stat-label">Completed</div>
+            </div>
+        </div>
+    `;
+}
+
+async function updateBookingStatus(bookingId, status) {
+    try {
+        const response = await fetch(`/bookings/${bookingId}/status`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ status })
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            alert('Booking status updated successfully!');
+            loadBookings();
+        } else {
+            alert('Error updating booking: ' + data.message);
+        }
+    } catch (error) {
+        console.error('Error updating booking:', error);
+        alert('Error updating booking');
+    }
+}
+
+async function cancelBooking(bookingId) {
+    const reason = prompt('Please provide a reason for cancellation:');
+    if (!reason) return;
+    
+    try {
+        const response = await fetch(`/bookings/${bookingId}/cancel`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ reason })
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            alert('Booking cancelled successfully!');
+            loadBookings();
+        } else {
+            alert('Error cancelling booking: ' + data.message);
+        }
+    } catch (error) {
+        console.error('Error cancelling booking:', error);
+        alert('Error cancelling booking');
+    }
+}
+
+function setupBookingEventListeners() {
+    // Status filter
+    const statusFilter = document.getElementById('statusFilter');
+    if (statusFilter) {
+        statusFilter.addEventListener('change', function() {
+            loadBookings(this.value);
+        });
+    }
+}
+
+function showLoading() {
+    const loadingIndicator = document.getElementById('loadingIndicator');
+    if (loadingIndicator) {
+        loadingIndicator.style.display = 'block';
+    }
+}
+
+function hideLoading() {
+    const loadingIndicator = document.getElementById('loadingIndicator');
+    if (loadingIndicator) {
+        loadingIndicator.style.display = 'none';
+    }
+}
+
+function showError(message) {
+    alert(message); // TODO: Implement proper error display
+}
+
+// Services functionality
+function showCreateServiceModal() {
     const modal = new bootstrap.Modal(document.getElementById('createServiceModal'));
     modal.show();
 }
 
 async function loadMyServices() {
     try {
+        console.log('Loading my services...');
         const response = await fetch('/services/provider/my');
         const data = await response.json();
         
         if (data.success) {
+            console.log('Services loaded:', data.services);
             displayServices(data.services);
-            document.getElementById('servicesSection').style.display = 'block';
         } else {
+            console.error('Error loading services:', data.message);
             alert('Error loading services: ' + data.message);
         }
     } catch (error) {
@@ -349,9 +763,21 @@ async function loadMyServices() {
 }
 
 function displayServices(services) {
-    const servicesList = document.getElementById('servicesList');
+    console.log('displayServices called with:', services);
+    // Try to get the services list element - check both possible IDs
+    let servicesList = document.getElementById('myServicesTabList');
+    if (!servicesList) {
+        servicesList = document.getElementById('servicesList');
+    }
+    console.log('servicesList element:', servicesList);
+    
+    if (!servicesList) {
+        console.error('Services list element not found!');
+        return;
+    }
     
     if (services.length === 0) {
+        console.log('No services to display');
         servicesList.innerHTML = `
             <div class="col-12">
                 <div class="text-center py-4">
@@ -367,6 +793,7 @@ function displayServices(services) {
         return;
     }
     
+    console.log('Displaying', services.length, 'services');
     servicesList.innerHTML = services.map(service => `
         <div class="col-md-6 col-lg-4 mb-4">
             <div class="card service-card">
@@ -529,3 +956,85 @@ async function logout() {
     }
 }
 </script>
+
+<style>
+/* Booking cards */
+.booking-card {
+    background: white;
+    border-radius: var(--border-radius);
+    padding: 1.5rem;
+    box-shadow: var(--shadow-sm);
+    border: 1px solid #e2e8f0;
+}
+
+.booking-title {
+    color: var(--dark-color);
+    margin-bottom: 0.5rem;
+}
+
+.booking-description {
+    font-size: 0.95rem;
+    line-height: 1.5;
+}
+
+.detail-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.75rem;
+    font-size: 0.9rem;
+}
+
+.detail-item i {
+    color: var(--primary-color);
+    width: 16px;
+}
+
+.special-requests {
+    background: #f8f9fa;
+    padding: 0.75rem;
+    border-radius: 6px;
+    font-size: 0.9rem;
+}
+
+.booking-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.stat-card {
+    background: white;
+    border-radius: var(--border-radius);
+    padding: 1.5rem;
+    text-align: center;
+    box-shadow: var(--shadow-sm);
+    border: 1px solid #e2e8f0;
+}
+
+.stat-value {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--primary-color);
+}
+
+.stat-label {
+    color: var(--secondary-color);
+    font-size: 0.9rem;
+    margin-top: 0.25rem;
+}
+
+@media (max-width: 768px) {
+    .booking-card {
+        padding: 1rem;
+    }
+    
+    .booking-actions {
+        margin-top: 1rem;
+    }
+    
+    .detail-item {
+        font-size: 0.85rem;
+    }
+}
+</style>

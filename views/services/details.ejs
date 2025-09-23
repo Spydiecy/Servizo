@@ -77,10 +77,19 @@
     </div>
 </div>
 
+<!-- User data for JavaScript -->
+<script type="application/json" id="userData">
+<% if (typeof user !== 'undefined' && user) { %>
+<%- JSON.stringify(user) %>
+<% } else { %>
+null
+<% } %>
+</script>
+
 <script>
 let currentService = null;
 const serviceId = '<%= serviceId %>';
-const currentUser = <%- JSON.stringify(user || null) %>;
+const currentUser = JSON.parse(document.getElementById('userData').textContent);
 
 // Initialize page
 document.addEventListener('DOMContentLoaded', function() {
@@ -263,12 +272,28 @@ function setupBookingForm() {
         };
         
         try {
-            // TODO: Implement booking API
-            alert('Booking functionality will be implemented soon!');
+            const response = await fetch('/bookings', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(bookingData)
+            });
             
-            const modal = bootstrap.Modal.getInstance(document.getElementById('bookServiceModal'));
-            modal.hide();
-            this.reset();
+            const data = await response.json();
+            
+            if (data.success) {
+                alert('Booking created successfully! You will receive confirmation soon.');
+                
+                const modal = bootstrap.Modal.getInstance(document.getElementById('bookServiceModal'));
+                modal.hide();
+                this.reset();
+                
+                // Redirect to bookings page
+                window.location.href = '/bookings';
+            } else {
+                alert('Error creating booking: ' + data.message);
+            }
         } catch (error) {
             console.error('Error creating booking:', error);
             alert('Error creating booking');
