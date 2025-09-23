@@ -141,33 +141,6 @@
                             </div>
                         </div>
                         
-                        <!-- Provider Additional Fields -->
-                        <div id="providerFields" style="display: none;">
-                            <div class="form-floating mb-3">
-                                <select class="form-select" id="serviceCategory">
-                                    <option value="">Select Service Category</option>
-                                    <option value="cleaning">Cleaning Services</option>
-                                    <option value="ac">AC Services</option>
-                                    <option value="plumbing">Plumbing</option>
-                                    <option value="electrical">Electrical</option>
-                                    <option value="painting">Painting</option>
-                                    <option value="carpentry">Carpentry</option>
-                                </select>
-                                <label for="serviceCategory">Service Category</label>
-                                <div class="form-icon">
-                                    <i class="fas fa-tools"></i>
-                                </div>
-                            </div>
-                            
-                            <div class="form-floating mb-3">
-                                <textarea class="form-control" id="experience" placeholder="Experience" style="height: 80px"></textarea>
-                                <label for="experience">Experience & Skills</label>
-                                <div class="form-icon">
-                                    <i class="fas fa-medal"></i>
-                                </div>
-                            </div>
-                        </div>
-                        
                         <!-- Password Strength Indicator -->
                         <div class="password-strength mb-3">
                             <div class="strength-bar">
@@ -215,15 +188,11 @@ function togglePassword(inputId) {
     }
 }
 
-// User type selection
+// User type selection - this will be used for database tagging
 document.querySelectorAll('input[name="userType"]').forEach(radio => {
     radio.addEventListener('change', function() {
-        const providerFields = document.getElementById('providerFields');
-        if (this.value === 'provider') {
-            providerFields.style.display = 'block';
-        } else {
-            providerFields.style.display = 'none';
-        }
+        // User type selection is now just for UI feedback and database storage
+        console.log('Selected user type:', this.value);
     });
 });
 
@@ -279,6 +248,7 @@ document.getElementById('registerForm').addEventListener('submit', function(e) {
     
     const password = document.getElementById('password').value;
     const confirmPassword = document.getElementById('confirmPassword').value;
+    const userType = document.querySelector('input[name="userType"]:checked').value;
     
     if (password !== confirmPassword) {
         alert('Passwords do not match!');
@@ -291,6 +261,18 @@ document.getElementById('registerForm').addEventListener('submit', function(e) {
     submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Creating Account...';
     submitBtn.disabled = true;
     
+    // Get form data
+    const formData = {
+        firstName: document.getElementById('firstName').value,
+        lastName: document.getElementById('lastName').value,
+        email: document.getElementById('email').value,
+        phone: document.getElementById('phone').value,
+        password: password,
+        userType: userType // This will be used for database tagging
+    };
+    
+    console.log('Registration data:', formData);
+    
     // Simulate API call
     setTimeout(() => {
         // Reset button
@@ -298,7 +280,7 @@ document.getElementById('registerForm').addEventListener('submit', function(e) {
         submitBtn.disabled = false;
         
         // Show success message
-        alert('Registration functionality will be implemented in backend!');
+        alert(`Registration functionality will be implemented in backend! User type: ${userType}`);
     }, 2000);
 });
 </script>
