@@ -1,0 +1,378 @@
+<!-- Contact Page -->
+<section class="contact-hero-section">
+    <div class="container">
+        <div class="row align-items-center min-vh-50">
+            <div class="col-lg-6 col-md-12">
+                <div class="hero-content">
+                    <h1 class="hero-title">Get In Touch</h1>
+                    <p class="hero-subtitle">
+                        Have questions? Need support? We're here to help! Reach out to us through 
+                        any of the channels below and we'll get back to you as soon as possible.
+                    </p>
+                    <div class="contact-stats">
+                        <div class="row">
+                            <div class="col-4">
+                                <div class="stat-item">
+                                    <h4>24/7</h4>
+                                    <span>Support Available</span>
+                                </div>
+                            </div>
+                            <div class="col-4">
+                                <div class="stat-item">
+                                    <h4>&lt;2hrs</h4>
+                                    <span>Response Time</span>
+                                </div>
+                            </div>
+                            <div class="col-4">
+                                <div class="stat-item">
+                                    <h4>99%</h4>
+                                    <span>Customer Satisfaction</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6 col-md-12">
+                <div class="hero-image">
+                    <div class="contact-card">
+                        <div class="contact-preview">
+                            <div class="contact-header">
+                                <div class="contact-icon">
+                                    <i class="fas fa-headset"></i>
+                                </div>
+                                <div>
+                                    <h6>We're Here to Help</h6>
+                                    <div class="availability">
+                                        <span class="status-dot"></span>
+                                        <span>Online now - Ready to assist</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <p>Our dedicated support team is available around the clock to answer your questions and resolve any issues.</p>
+                            <div class="contact-features">
+                                <span class="feature">Live Chat</span>
+                                <span class="feature">Phone Support</span>
+                                <span class="feature">Email Help</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Contact Methods Section -->
+<section class="contact-methods-section py-5">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 mx-auto text-center">
+                <div class="section-header">
+                    <h2>Choose Your Preferred Way to Connect</h2>
+                    <p class="section-subtitle">
+                        Multiple ways to reach us - pick what works best for you
+                    </p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="row mt-5">
+            <div class="col-lg-4 col-md-6 mb-4">
+                <div class="contact-method-card">
+                    <div class="method-icon">
+                        <i class="fas fa-phone"></i>
+                    </div>
+                    <h5>Phone Support</h5>
+                    <p>Speak directly with our support team for immediate assistance.</p>
+                    <div class="contact-details">
+                        <a href="tel:+15551234567" class="contact-link">
+                            <i class="fas fa-phone-alt me-2"></i>
+                            +1 (555) 123-4567
+                        </a>
+                        <span class="availability-text">Available 24/7</span>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4 col-md-6 mb-4">
+                <div class="contact-method-card">
+                    <div class="method-icon">
+                        <i class="fas fa-envelope"></i>
+                    </div>
+                    <h5>Email Support</h5>
+                    <p>Send us detailed questions and we'll respond within 2 hours.</p>
+                    <div class="contact-details">
+                        <a href="mailto:support@servizo.com" class="contact-link">
+                            <i class="fas fa-envelope me-2"></i>
+                            support@servizo.com
+                        </a>
+                        <span class="availability-text">Response within 2 hours</span>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4 col-md-6 mb-4">
+                <div class="contact-method-card">
+                    <div class="method-icon">
+                        <i class="fas fa-comments"></i>
+                    </div>
+                    <h5>Live Chat</h5>
+                    <p>Get instant answers through our live chat support system.</p>
+                    <div class="contact-details">
+                        <button class="btn btn-primary btn-sm" onclick="openLiveChat()">
+                            <i class="fas fa-comment me-2"></i>
+                            Start Live Chat
+                        </button>
+                        <span class="availability-text">
+                            <span class="status-dot"></span>
+                            Online now
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Contact Form Section -->
+<section class="contact-form-section py-5 bg-light">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 mx-auto">
+                <div class="contact-form-card">
+                    <div class="form-header text-center">
+                        <h3>Send Us a Message</h3>
+                        <p>Fill out the form below and we'll get back to you shortly</p>
+                    </div>
+                    
+                    <form class="contact-form" id="contactForm">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <div class="form-floating">
+                                    <i class="fas fa-user form-icon"></i>
+                                    <input type="text" class="form-control" id="firstName" name="firstName" placeholder="First Name" required>
+                                    <label for="firstName">First Name</label>
+                                </div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <div class="form-floating">
+                                    <i class="fas fa-user form-icon"></i>
+                                    <input type="text" class="form-control" id="lastName" name="lastName" placeholder="Last Name" required>
+                                    <label for="lastName">Last Name</label>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <div class="form-floating">
+                                    <i class="fas fa-envelope form-icon"></i>
+                                    <input type="email" class="form-control" id="email" name="email" placeholder="Email Address" required>
+                                    <label for="email">Email Address</label>
+                                </div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <div class="form-floating">
+                                    <i class="fas fa-phone form-icon"></i>
+                                    <input type="tel" class="form-control" id="phone" name="phone" placeholder="Phone Number">
+                                    <label for="phone">Phone Number (Optional)</label>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <div class="form-floating">
+                                <i class="fas fa-tag form-icon"></i>
+                                <select class="form-select" id="subject" name="subject" required>
+                                    <option value="">Choose a subject</option>
+                                    <option value="general">General Inquiry</option>
+                                    <option value="booking">Booking Support</option>
+                                    <option value="technical">Technical Issue</option>
+                                    <option value="billing">Billing Question</option>
+                                    <option value="partnership">Partnership Inquiry</option>
+                                    <option value="complaint">Complaint</option>
+                                    <option value="other">Other</option>
+                                </select>
+                                <label for="subject">Subject</label>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <div class="form-floating">
+                                <i class="fas fa-comment-alt form-icon"></i>
+                                <textarea class="form-control" id="message" name="message" placeholder="Your Message" style="height: 120px" required></textarea>
+                                <label for="message">Your Message</label>
+                            </div>
+                        </div>
+                        
+                        <div class="text-center">
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="fas fa-paper-plane me-2"></i>
+                                Send Message
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Office Info Section -->
+<section class="office-section py-5">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 mx-auto text-center">
+                <div class="section-header">
+                    <h2>Visit Our Office</h2>
+                    <p class="section-subtitle">
+                        Prefer to meet in person? Come visit us at our headquarters
+                    </p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="row mt-5">
+            <div class="col-lg-6 mb-4">
+                <div class="office-info">
+                    <h5>Headquarters</h5>
+                    <div class="office-details">
+                        <div class="detail-item">
+                            <i class="fas fa-map-marker-alt"></i>
+                            <div>
+                                <strong>Address</strong>
+                                <p>123 Innovation Drive, Suite 400<br>Tech City, TC 12345</p>
+                            </div>
+                        </div>
+                        <div class="detail-item">
+                            <i class="fas fa-clock"></i>
+                            <div>
+                                <strong>Office Hours</strong>
+                                <p>Monday - Friday: 9:00 AM - 6:00 PM<br>
+                                Saturday: 10:00 AM - 4:00 PM<br>
+                                Sunday: Closed</p>
+                            </div>
+                        </div>
+                        <div class="detail-item">
+                            <i class="fas fa-car"></i>
+                            <div>
+                                <strong>Parking</strong>
+                                <p>Free parking available in the building garage</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6 mb-4">
+                <div class="map-container">
+                    <div class="map-placeholder">
+                        <i class="fas fa-map"></i>
+                        <h6>Interactive Map</h6>
+                        <p>Click to view directions</p>
+                        <button class="btn btn-outline-primary btn-sm">
+                            <i class="fas fa-directions me-2"></i>
+                            Get Directions
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- FAQ Section -->
+<section class="faq-section py-5 bg-light">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 mx-auto text-center">
+                <div class="section-header">
+                    <h2>Frequently Asked Questions</h2>
+                    <p class="section-subtitle">
+                        Quick answers to common questions
+                    </p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="row mt-5">
+            <div class="col-lg-8 mx-auto">
+                <div class="accordion" id="faqAccordion">
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="faq1">
+                            <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapse1">
+                                How quickly can I get a service provider?
+                            </button>
+                        </h2>
+                        <div id="collapse1" class="accordion-collapse collapse show" data-bs-parent="#faqAccordion">
+                            <div class="accordion-body">
+                                Most service providers can be scheduled within 24-48 hours. For urgent requests, we offer same-day service in many areas.
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="faq2">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse2">
+                                Are all service providers background checked?
+                            </button>
+                        </h2>
+                        <div id="collapse2" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                            <div class="accordion-body">
+                                Yes, all our service providers undergo thorough background checks, verification of licenses, and insurance verification before joining our platform.
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="faq3">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse3">
+                                What if I'm not satisfied with the service?
+                            </button>
+                        </h2>
+                        <div id="collapse3" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                            <div class="accordion-body">
+                                We offer a satisfaction guarantee. If you're not happy with the service, contact us within 24 hours and we'll make it right or provide a full refund.
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="faq4">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse4">
+                                How do I track my service request?
+                            </button>
+                        </h2>
+                        <div id="collapse4" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                            <div class="accordion-body">
+                                You can track your service request in real-time through your dashboard, receive SMS updates, and get notifications when the provider is on their way.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<script>
+function openLiveChat() {
+    alert('Live chat feature will be implemented soon! For immediate assistance, please call us at +1 (555) 123-4567 or email support@servizo.com');
+}
+
+document.getElementById('contactForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    // Get form data
+    const formData = new FormData(this);
+    const data = Object.fromEntries(formData);
+    
+    // Simple validation
+    if (!data.firstName || !data.lastName || !data.email || !data.subject || !data.message) {
+        alert('Please fill in all required fields.');
+        return;
+    }
+    
+    // Show success message (in real app, this would submit to server)
+    alert('Thank you for your message! We\'ll get back to you within 2 hours.');
+    this.reset();
+});
+</script>

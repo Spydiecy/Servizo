@@ -63,19 +63,19 @@ const initializeApp = async () => {
             });
         });
 
-        // Coming soon pages - These will show 404 until implemented
+        // About and Contact pages
         app.get('/about', (req, res) => {
-            res.status(404).render('layouts/main', {
-                title: 'Page Not Found',
-                page: '404',
+            res.render('layouts/main', {
+                title: 'About Us',
+                page: 'about',
                 user: req.user
             });
         });
 
         app.get('/contact', (req, res) => {
-            res.status(404).render('layouts/main', {
-                title: 'Page Not Found',
-                page: '404',
+            res.render('layouts/main', {
+                title: 'Contact Us',
+                page: 'contact',
                 user: req.user
             });
         });
