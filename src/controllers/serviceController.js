@@ -1,5 +1,6 @@
 const Service = require('../models/Service');
 const User = require('../models/User');
+const { getRedisClient } = require('../config/redis');
 
 // Create a new service (Provider only)
 const createService = async (req, res) => {
@@ -51,6 +52,20 @@ const createService = async (req, res) => {
 
         await service.save();
 
+        // Invalidate Redis cache for services
+        const redisClient = getRedisClient();
+        if (redisClient) {
+            try {
+                const keys = await redisClient.keys('services_*');
+                if (keys.length > 0) {
+                    await redisClient.del(keys);
+                    console.log('🗑️  Cleared services cache after creation');
+                }
+            } catch (redisError) {
+                console.error('Redis cache clear error:', redisError.message);
+            }
+        }
+
         res.status(201).json({
             success: true,
             message: 'Service created successfully',
@@ -80,6 +95,24 @@ const getAllServices = async (req, res) => {
             page = 1,
             limit = 12
         } = req.query;
+
+        // Create cache key based on query parameters (using underscores for flat structure)
+        const cacheKey = `services_${category || 'all'}_${city || 'all'}_${minPrice || '0'}_${maxPrice || 'max'}_${sortBy}_${sortOrder}_${page}_${limit}`;
+        
+        // Try to get from Redis cache
+        const redisClient = getRedisClient();
+        if (redisClient) {
+            try {
+                const cachedData = await redisClient.get(cacheKey);
+                if (cachedData) {
+                    console.log('✅ Serving services from Redis cache');
+                    return res.json(JSON.parse(cachedData));
+                }
+            } catch (redisError) {
+                console.error('Redis get error:', redisError.message);
+                // Continue to fetch from database if Redis fails
+            }
+        }
 
         // Build filter object
         const filter = { isActive: true };
@@ -122,7 +155,7 @@ const getAllServices = async (req, res) => {
         const totalServices = await Service.countDocuments(filter);
         const totalPages = Math.ceil(totalServices / parseInt(limit));
 
-        res.json({
+        const responseData = {
             success: true,
             services,
             pagination: {
@@ -132,7 +165,20 @@ const getAllServices = async (req, res) => {
                 hasNextPage: page < totalPages,
                 hasPrevPage: page > 1
             }
-        });
+        };
+
+        // Store in Redis cache for 10 minutes
+        if (redisClient) {
+            try {
+                await redisClient.setEx(cacheKey, 600, JSON.stringify(responseData));
+                console.log('💾 Services cached in Redis');
+            } catch (redisError) {
+                console.error('Redis set error:', redisError.message);
+                // Continue even if caching fails
+            }
+        }
+
+        res.json(responseData);
 
     } catch (error) {
         console.error('Get services error:', error);
@@ -229,6 +275,20 @@ const updateService = async (req, res) => {
             { new: true, runValidators: true }
         );
 
+        // Invalidate Redis cache for services
+        const redisClient = getRedisClient();
+        if (redisClient) {
+            try {
+                const keys = await redisClient.keys('services_*');
+                if (keys.length > 0) {
+                    await redisClient.del(keys);
+                    console.log('🗑️  Cleared services cache after update');
+                }
+            } catch (redisError) {
+                console.error('Redis cache clear error:', redisError.message);
+            }
+        }
+
         res.json({
             success: true,
             message: 'Service updated successfully',
@@ -267,6 +327,20 @@ const deleteService = async (req, res) => {
 
         await Service.findByIdAndDelete(req.params.id);
 
+        // Invalidate Redis cache for services
+        const redisClient = getRedisClient();
+        if (redisClient) {
+            try {
+                const keys = await redisClient.keys('services_*');
+                if (keys.length > 0) {
+                    await redisClient.del(keys);
+                    console.log('🗑️  Cleared services cache after deletion');
+                }
+            } catch (redisError) {
+                console.error('Redis cache clear error:', redisError.message);
+            }
+        }
+
         res.json({
             success: true,
             message: 'Service deleted successfully'
@@ -304,6 +378,20 @@ const toggleServiceStatus = async (req, res) => {
 
         service.isActive = !service.isActive;
         await service.save();
+
+        // Invalidate Redis cache for services
+        const redisClient = getRedisClient();
+        if (redisClient) {
+            try {
+                const keys = await redisClient.keys('services_*');
+                if (keys.length > 0) {
+                    await redisClient.del(keys);
+                    console.log('🗑️  Cleared services cache after status toggle');
+                }
+            } catch (redisError) {
+                console.error('Redis cache clear error:', redisError.message);
+            }
+        }
 
         res.json({
             success: true,
