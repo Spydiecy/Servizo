@@ -2648,3 +2648,64 @@ html {
         padding: 1.5rem;
     }
 }
+
+/* ===== RECENT SEARCHES & RECENTLY VIEWED STYLES ===== */
+.recent-searches {
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.recent-searches h6 {
+    color: var(--dark-color);
+    font-weight: 600;
+}
+
+#recentSearchesList {
+    gap: 0.5rem;
+}
+
+#recentSearchesList .btn {
+    border-radius: 20px;
+    font-size: 0.875rem;
+    padding: 0.375rem 0.75rem;
+    transition: var(--transition);
+}
+
+#recentSearchesList .btn:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
+
+#recentlyViewedSection {
+    border-top: 2px solid #e5e7eb;
+    padding-top: 2rem;
+}
+
+#recentlyViewedSection h4 {
+    color: var(--dark-color);
+    font-weight: 600;
+}
+
+#recentlyViewedSection .service-card {
+    transition: var(--transition);
+    height: 100%;
+}
+
+#recentlyViewedSection .service-card:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-lg);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    #recentSearchesList {
+        flex-direction: column;
+    }
+    
+    #recentSearchesList .btn {
+        width: 100%;
+    }
+    
+    #recentlyViewedSection h4 {
+        font-size: 1.25rem;
+    }
+}

@@ -109,6 +109,21 @@
         </div>
     </section>
 
+    <!-- Recent Searches Section -->
+    <section id="recentSearchesSection" class="recent-searches py-3 bg-white" style="display: none;">
+        <div class="container">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <h6 class="mb-0"><i class="fas fa-history"></i> Recent Searches</h6>
+                <button class="btn btn-sm btn-link text-danger" onclick="clearRecentSearches()">
+                    <i class="fas fa-trash"></i> Clear
+                </button>
+            </div>
+            <div id="recentSearchesList" class="d-flex flex-wrap gap-2">
+                <!-- Recent searches will be added here -->
+            </div>
+        </div>
+    </section>
+
     <!-- Filters Section -->
     <section class="filters-section py-4 bg-light">
         <div class="container">
@@ -162,6 +177,19 @@
                 <p class="text-muted">Try adjusting your search criteria or browse different categories.</p>
             </div>
             
+            <!-- Recently Viewed Services -->
+            <div id="recentlyViewedSection" class="mt-5" style="display: none;">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h4><i class="fas fa-eye"></i> Recently Viewed Services</h4>
+                    <button class="btn btn-sm btn-outline-danger" onclick="clearRecentlyViewed()">
+                        <i class="fas fa-trash"></i> Clear History
+                    </button>
+                </div>
+                <div id="recentlyViewedGrid" class="row">
+                    <!-- Recently viewed services will be loaded here -->
+                </div>
+            </div>
+            
             <!-- Pagination -->
             <nav id="pagination" class="mt-4" style="display: none;">
                 <ul class="pagination justify-content-center">
@@ -173,6 +201,13 @@
 </div>
 
 <script>
+// LocalStorage keys
+const STORAGE_KEYS = {
+    RECENT_SEARCHES: 'servizo_recent_searches',
+    FILTER_PREFERENCES: 'servizo_filter_preferences',
+    RECENTLY_VIEWED: 'servizo_recently_viewed'
+};
+
 let currentPage = 1;
 let currentCategory = '';
 let currentCity = '';
@@ -180,8 +215,11 @@ let currentFilters = {};
 
 // Initialize page
 document.addEventListener('DOMContentLoaded', function() {
+    loadFilterPreferences();
+    displayRecentSearches();
     loadServices();
     setupEventListeners();
+    loadRecentlyViewed();
 });
 
 function setupEventListeners() {
@@ -200,9 +238,210 @@ function setupEventListeners() {
     });
     
     // Filters
-    document.getElementById('sortBy').addEventListener('change', applyFilters);
-    document.getElementById('minPrice').addEventListener('input', debounce(applyFilters, 500));
-    document.getElementById('maxPrice').addEventListener('input', debounce(applyFilters, 500));
+    document.getElementById('sortBy').addEventListener('change', function() {
+        applyFilters();
+        saveFilterPreferences();
+    });
+    document.getElementById('minPrice').addEventListener('input', debounce(function() {
+        applyFilters();
+        saveFilterPreferences();
+    }, 500));
+    document.getElementById('maxPrice').addEventListener('input', debounce(function() {
+        applyFilters();
+        saveFilterPreferences();
+    }, 500));
+}
+
+// ===== LocalStorage Functions =====
+
+// Recent Searches Management
+function saveRecentSearch(query, city) {
+    if (!query && !city) return;
+    
+    let searches = getRecentSearches();
+    const newSearch = {
+        query: query || '',
+        city: city || '',
+        timestamp: Date.now()
+    };
+    
+    // Remove duplicate
+    searches = searches.filter(s => !(s.query === newSearch.query && s.city === newSearch.city));
+    
+    // Add to beginning
+    searches.unshift(newSearch);
+    
+    // Keep only last 5
+    searches = searches.slice(0, 5);
+    
+    localStorage.setItem(STORAGE_KEYS.RECENT_SEARCHES, JSON.stringify(searches));
+    displayRecentSearches();
+}
+
+function getRecentSearches() {
+    try {
+        return JSON.parse(localStorage.getItem(STORAGE_KEYS.RECENT_SEARCHES)) || [];
+    } catch (e) {
+        return [];
+    }
+}
+
+function displayRecentSearches() {
+    const searches = getRecentSearches();
+    const container = document.getElementById('recentSearchesList');
+    const section = document.getElementById('recentSearchesSection');
+    
+    if (searches.length === 0) {
+        section.style.display = 'none';
+        return;
+    }
+    
+    section.style.display = 'block';
+    container.innerHTML = searches.map(search => {
+        const label = search.query && search.city 
+            ? `${search.query} in ${search.city}`
+            : search.query || search.city;
+        return `
+            <button class="btn btn-sm btn-outline-primary" onclick="applyRecentSearch('${search.query}', '${search.city}')">
+                <i class="fas fa-search"></i> ${label}
+            </button>
+        `;
+    }).join('');
+}
+
+function applyRecentSearch(query, city) {
+    document.getElementById('searchQuery').value = query;
+    document.getElementById('citySearch').value = city;
+    searchServices();
+}
+
+function clearRecentSearches() {
+    if (confirm('Clear all recent searches?')) {
+        localStorage.removeItem(STORAGE_KEYS.RECENT_SEARCHES);
+        displayRecentSearches();
+    }
+}
+
+// Filter Preferences Management
+function saveFilterPreferences() {
+    const preferences = {
+        sortBy: document.getElementById('sortBy').value,
+        minPrice: document.getElementById('minPrice').value,
+        maxPrice: document.getElementById('maxPrice').value
+    };
+    localStorage.setItem(STORAGE_KEYS.FILTER_PREFERENCES, JSON.stringify(preferences));
+}
+
+function loadFilterPreferences() {
+    try {
+        const preferences = JSON.parse(localStorage.getItem(STORAGE_KEYS.FILTER_PREFERENCES));
+        if (preferences) {
+            if (preferences.sortBy) {
+                document.getElementById('sortBy').value = preferences.sortBy;
+            }
+            if (preferences.minPrice) {
+                document.getElementById('minPrice').value = preferences.minPrice;
+            }
+            if (preferences.maxPrice) {
+                document.getElementById('maxPrice').value = preferences.maxPrice;
+            }
+        }
+    } catch (e) {
+        console.error('Error loading filter preferences:', e);
+    }
+}
+
+// Recently Viewed Services Management
+function addToRecentlyViewed(serviceId) {
+    let viewed = getRecentlyViewed();
+    
+    // Remove if already exists
+    viewed = viewed.filter(id => id !== serviceId);
+    
+    // Add to beginning
+    viewed.unshift(serviceId);
+    
+    // Keep only last 6
+    viewed = viewed.slice(0, 6);
+    
+    localStorage.setItem(STORAGE_KEYS.RECENTLY_VIEWED, JSON.stringify(viewed));
+}
+
+function getRecentlyViewed() {
+    try {
+        return JSON.parse(localStorage.getItem(STORAGE_KEYS.RECENTLY_VIEWED)) || [];
+    } catch (e) {
+        return [];
+    }
+}
+
+async function loadRecentlyViewed() {
+    const viewedIds = getRecentlyViewed();
+    if (viewedIds.length === 0) return;
+    
+    try {
+        const response = await fetch('/services/api?ids=' + viewedIds.join(','));
+        const data = await response.json();
+        
+        if (data.success && data.services.length > 0) {
+            displayRecentlyViewed(data.services);
+        }
+    } catch (error) {
+        console.error('Error loading recently viewed:', error);
+    }
+}
+
+function displayRecentlyViewed(services) {
+    const section = document.getElementById('recentlyViewedSection');
+    const grid = document.getElementById('recentlyViewedGrid');
+    
+    if (services.length === 0) {
+        section.style.display = 'none';
+        return;
+    }
+    
+    section.style.display = 'block';
+    grid.innerHTML = services.map(service => `
+        <div class="col-lg-4 col-md-6 mb-4">
+            <div class="service-card">
+                <div class="service-card-header">
+                    <div class="service-category">
+                        <span class="badge bg-primary">${service.category}</span>
+                    </div>
+                    <div class="service-rating">
+                        <i class="fas fa-star text-warning"></i>
+                        <span>${service.rating?.average || 0}</span>
+                    </div>
+                </div>
+                
+                <div class="service-card-body">
+                    <h5 class="service-title">${service.title}</h5>
+                    <p class="service-description">${service.description.substring(0, 100)}...</p>
+                    
+                    <div class="service-location mb-2">
+                        <i class="fas fa-map-marker-alt"></i>
+                        <span>${service.serviceArea?.city || 'Location not specified'}</span>
+                    </div>
+                </div>
+                
+                <div class="service-card-footer">
+                    <div class="service-price">
+                        <span class="price">₹${service.price}</span>
+                    </div>
+                    <button class="btn btn-primary btn-sm" onclick="viewService('${service._id}')">
+                        View Again
+                    </button>
+                </div>
+            </div>
+        </div>
+    `).join('');
+}
+
+function clearRecentlyViewed() {
+    if (confirm('Clear recently viewed services?')) {
+        localStorage.removeItem(STORAGE_KEYS.RECENTLY_VIEWED);
+        document.getElementById('recentlyViewedSection').style.display = 'none';
+    }
 }
 
 async function loadServices(filters = {}) {
@@ -324,6 +563,9 @@ function searchServices() {
     const query = document.getElementById('searchQuery').value;
     const city = document.getElementById('citySearch').value;
     
+    // Save to recent searches
+    saveRecentSearch(query, city);
+    
     currentPage = 1;
     currentCity = city;
     
@@ -338,6 +580,9 @@ function applyFilters() {
     const sortBy = document.getElementById('sortBy').value;
     const minPrice = document.getElementById('minPrice').value;
     const maxPrice = document.getElementById('maxPrice').value;
+    
+    // Save filter preferences
+    saveFilterPreferences();
     
     const filters = {
         sortBy,
@@ -406,6 +651,7 @@ function updateResultsInfo(pagination) {
 }
 
 function viewService(serviceId) {
+    addToRecentlyViewed(serviceId);
     window.location.href = `/services/${serviceId}`;
 }
 
