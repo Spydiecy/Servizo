@@ -29,7 +29,7 @@
     </section>
 
     <!-- Categories Section -->
-    <section class="categories-section py-5">
+    <section id="categoriesSection" class="categories-section py-5">
         <div class="container">
             <h2 class="text-center mb-5">Browse by Category</h2>
             <div class="row" id="categoriesGrid">
@@ -129,7 +129,12 @@
         <div class="container">
             <div class="row align-items-center">
                 <div class="col-md-6">
-                    <h4 id="resultsTitle">All Services</h4>
+                    <div class="d-flex align-items-center gap-2">
+                        <h4 id="resultsTitle" class="mb-0">All Services</h4>
+                        <button id="showAllBtn" class="btn btn-sm btn-outline-primary" onclick="showAllServices()" style="display: none;">
+                            <i class="fas fa-times"></i> Clear Search
+                        </button>
+                    </div>
                     <p id="resultsCount" class="text-muted">Loading services...</p>
                 </div>
                 <div class="col-md-6">
@@ -535,6 +540,10 @@ function filterByCategory(category) {
     currentCategory = category;
     currentPage = 1;
     
+    // Clear search inputs when filtering by category
+    document.getElementById('searchQuery').value = '';
+    document.getElementById('citySearch').value = '';
+    
     // Update active category
     document.querySelectorAll('.category-card').forEach(card => {
         card.classList.remove('active');
@@ -563,6 +572,12 @@ function searchServices() {
     const query = document.getElementById('searchQuery').value;
     const city = document.getElementById('citySearch').value;
     
+    // Hide categories section when searching
+    if (query || city) {
+        document.getElementById('categoriesSection').style.display = 'none';
+        document.getElementById('showAllBtn').style.display = 'inline-block';
+    }
+    
     // Save to recent searches
     saveRecentSearch(query, city);
     
@@ -574,6 +589,32 @@ function searchServices() {
     if (query) filters.search = query;
     
     loadServices(filters);
+}
+
+function showAllServices() {
+    // Clear search inputs
+    document.getElementById('searchQuery').value = '';
+    document.getElementById('citySearch').value = '';
+    
+    // Show categories section
+    document.getElementById('categoriesSection').style.display = 'block';
+    document.getElementById('showAllBtn').style.display = 'none';
+    
+    // Reset filters
+    currentCategory = '';
+    currentCity = '';
+    currentPage = 1;
+    
+    // Update title
+    document.getElementById('resultsTitle').textContent = 'All Services';
+    
+    // Remove active category
+    document.querySelectorAll('.category-card').forEach(card => {
+        card.classList.remove('active');
+    });
+    
+    // Load all services
+    loadServices();
 }
 
 function applyFilters() {
