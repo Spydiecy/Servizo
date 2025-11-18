@@ -1,0 +1,217 @@
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-5">
+            <div class="card shadow-lg border-0">
+                <div class="card-body p-5">
+                    <div class="text-center mb-4">
+                        <div class="mb-3">
+                            <i class="fas fa-envelope-open-text fa-4x text-primary"></i>
+                        </div>
+                        <h2 class="card-title mb-2">Verify Your Email</h2>
+                        <p class="text-muted">Enter the 6-digit OTP sent to your email</p>
+                    </div>
+
+                    <!-- Alert Container -->
+                    <div id="alertContainer"></div>
+
+                    <!-- OTP Form -->
+                    <form id="otpForm">
+                        <div class="mb-4">
+                            <label for="email" class="form-label">Email Address</label>
+                            <div class="input-group">
+                                <span class="input-group-text">
+                                    <i class="fas fa-envelope"></i>
+                                </span>
+                                <input type="email" class="form-control" id="email" name="email" required>
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <label for="otp" class="form-label">Enter OTP</label>
+                            <div class="input-group">
+                                <span class="input-group-text">
+                                    <i class="fas fa-key"></i>
+                                </span>
+                                <input type="text" class="form-control form-control-lg text-center" 
+                                       id="otp" name="otp" maxlength="6" pattern="[0-9]{6}" 
+                                       placeholder="000000" required style="letter-spacing: 0.5em; font-size: 1.5rem;">
+                            </div>
+                            <small class="text-muted">Valid for 10 minutes</small>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary w-100 py-2 mb-3" id="verifyBtn">
+                            <i class="fas fa-check-circle me-2"></i>Verify Email
+                        </button>
+
+                        <div class="text-center">
+                            <p class="mb-2">Didn't receive the code?</p>
+                            <button type="button" class="btn btn-link text-decoration-none" id="resendBtn">
+                                <i class="fas fa-redo me-1"></i>Resend OTP
+                            </button>
+                        </div>
+                    </form>
+
+                    <div class="text-center mt-4 pt-3 border-top">
+                        <a href="/auth/login" class="text-decoration-none">
+                            <i class="fas fa-arrow-left me-1"></i>Back to Login
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .card {
+        border-radius: 15px;
+    }
+    
+    .input-group-text {
+        background-color: #f8f9fa;
+        border-right: none;
+    }
+    
+    .form-control:focus {
+        border-color: #667eea;
+        box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+    }
+    
+    #otp {
+        font-weight: bold;
+        color: #667eea;
+    }
+    
+    #otp::placeholder {
+        color: #dee2e6;
+        font-weight: normal;
+    }
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const otpForm = document.getElementById('otpForm');
+    const resendBtn = document.getElementById('resendBtn');
+    const verifyBtn = document.getElementById('verifyBtn');
+    const alertContainer = document.getElementById('alertContainer');
+    const emailInput = document.getElementById('email');
+    const otpInput = document.getElementById('otp');
+
+    // Get email from URL params if available
+    const urlParams = new URLSearchParams(window.location.search);
+    const emailParam = urlParams.get('email');
+    if (emailParam) {
+        emailInput.value = emailParam;
+        emailInput.readOnly = true;
+    }
+
+    // Auto-focus OTP input and format
+    otpInput.addEventListener('input', function(e) {
+        this.value = this.value.replace(/[^0-9]/g, '');
+    });
+
+    // Show alert
+    function showAlert(message, type = 'danger') {
+        alertContainer.innerHTML = `
+            <div class="alert alert-${type} alert-dismissible fade show" role="alert">
+                <i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'} me-2"></i>
+                ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        `;
+    }
+
+    // Verify OTP
+    otpForm.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        const email = emailInput.value.trim();
+        const otp = otpInput.value.trim();
+
+        if (!email || !otp || otp.length !== 6) {
+            showAlert('Please enter a valid email and 6-digit OTP');
+            return;
+        }
+
+        verifyBtn.disabled = true;
+        verifyBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Verifying...';
+
+        try {
+            const response = await fetch('/auth/verify-otp', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ email, otp })
+            });
+
+            const data = await response.json();
+
+            if (data.success) {
+                showAlert(data.message, 'success');
+                setTimeout(() => {
+                    window.location.href = '/dashboard';
+                }, 1500);
+            } else {
+                showAlert(data.message || 'Verification failed');
+                verifyBtn.disabled = false;
+                verifyBtn.innerHTML = '<i class="fas fa-check-circle me-2"></i>Verify Email';
+            }
+        } catch (error) {
+            showAlert('An error occurred. Please try again.');
+            verifyBtn.disabled = false;
+            verifyBtn.innerHTML = '<i class="fas fa-check-circle me-2"></i>Verify Email';
+        }
+    });
+
+    // Resend OTP
+    resendBtn.addEventListener('click', async function() {
+        const email = emailInput.value.trim();
+
+        if (!email) {
+            showAlert('Please enter your email address');
+            return;
+        }
+
+        resendBtn.disabled = true;
+        resendBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>Sending...';
+
+        try {
+            const response = await fetch('/auth/resend-otp', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ email })
+            });
+
+            const data = await response.json();
+
+            if (data.success) {
+                showAlert(data.message, 'success');
+                
+                // Countdown timer
+                let countdown = 60;
+                const timer = setInterval(() => {
+                    resendBtn.innerHTML = `<i class="fas fa-clock me-1"></i>Resend in ${countdown}s`;
+                    countdown--;
+                    
+                    if (countdown < 0) {
+                        clearInterval(timer);
+                        resendBtn.disabled = false;
+                        resendBtn.innerHTML = '<i class="fas fa-redo me-1"></i>Resend OTP';
+                    }
+                }, 1000);
+            } else {
+                showAlert(data.message || 'Failed to resend OTP');
+                resendBtn.disabled = false;
+                resendBtn.innerHTML = '<i class="fas fa-redo me-1"></i>Resend OTP';
+            }
+        } catch (error) {
+            showAlert('An error occurred. Please try again.');
+            resendBtn.disabled = false;
+            resendBtn.innerHTML = '<i class="fas fa-redo me-1"></i>Resend OTP';
+        }
+    });
+});
+</script>

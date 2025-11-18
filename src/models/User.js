@@ -32,6 +32,18 @@ const userSchema = new mongoose.Schema({
         required: [true, 'Password is required'],
         minlength: [6, 'Password must be at least 6 characters long']
     },
+    emailVerified: {
+        type: Boolean,
+        default: false
+    },
+    otp: {
+        type: String,
+        default: null
+    },
+    otpExpires: {
+        type: Date,
+        default: null
+    },
     userType: {
         type: String,
         enum: ['customer', 'provider'],

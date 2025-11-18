@@ -1,4 +1,5 @@
 const User = require('../models/User');
+const { generateOTP, sendOTPEmail, sendWelcomeEmail } = require('../services/emailService');
 
 // Register user
 const registerUser = async (req, res) => {
@@ -8,11 +9,44 @@ const registerUser = async (req, res) => {
         // Check if user already exists
         const existingUser = await User.findOne({ email });
         if (existingUser) {
+            // If user exists but email not verified, allow re-registration with OTP
+            if (!existingUser.emailVerified) {
+                // Check if OTP already exists and is not expired
+                const hasValidOTP = existingUser.otp && existingUser.otpExpires && new Date() < existingUser.otpExpires;
+                
+                if (!hasValidOTP) {
+                    // Generate and send new OTP
+                    const otp = generateOTP();
+                    const otpExpires = new Date(Date.now() + 10 * 60 * 1000);
+                    
+                    existingUser.otp = otp;
+                    existingUser.otpExpires = otpExpires;
+                    await existingUser.save();
+                    
+                    await sendOTPEmail(existingUser, otp);
+                }
+                
+                req.session.pendingUserId = existingUser._id;
+                
+                return res.status(200).json({
+                    success: true,
+                    message: hasValidOTP 
+                        ? 'Account exists but not verified. Please check your email for OTP.' 
+                        : 'OTP sent to your email. Please verify to continue.',
+                    requiresOTP: true,
+                    email: existingUser.email
+                });
+            }
+            
             return res.status(400).json({
                 success: false,
                 message: 'User with this email already exists'
             });
         }
+
+        // Generate OTP
+        const otp = generateOTP();
+        const otpExpires = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
 
         // Create new user
         const user = new User({
@@ -21,23 +55,25 @@ const registerUser = async (req, res) => {
             email,
             phone,
             password,
-            userType: userType || 'customer'
+            userType: userType || 'customer',
+            otp,
+            otpExpires,
+            emailVerified: false
         });
 
         await user.save();
 
-        // Remove password from response
-        const userResponse = user.toJSON();
-        delete userResponse.password;
+        // Send OTP email
+        await sendOTPEmail(user, otp);
 
-        // Set session
-        req.session.userId = user._id;
-        req.session.user = userResponse;
+        // Store user ID in session for OTP verification
+        req.session.pendingUserId = user._id;
 
         res.status(201).json({
             success: true,
-            message: 'User registered successfully',
-            user: userResponse
+            message: 'Registration successful! Please check your email for OTP verification.',
+            requiresOTP: true,
+            email: user.email
         });
 
     } catch (error) {
@@ -62,6 +98,115 @@ const registerUser = async (req, res) => {
         res.status(500).json({
             success: false,
             message: 'Server error during registration'
+        });
+    }
+};
+
+// Verify OTP
+const verifyOTP = async (req, res) => {
+    try {
+        const { email, otp } = req.body;
+
+        // Find user
+        const user = await User.findOne({ email });
+        
+        if (!user) {
+            return res.status(404).json({
+                success: false,
+                message: 'User not found'
+            });
+        }
+
+        // Check if OTP matches and is not expired
+        if (user.otp !== otp) {
+            return res.status(400).json({
+                success: false,
+                message: 'Invalid OTP'
+            });
+        }
+
+        if (new Date() > user.otpExpires) {
+            return res.status(400).json({
+                success: false,
+                message: 'OTP has expired. Please request a new one.'
+            });
+        }
+
+        // Mark email as verified and clear OTP
+        user.emailVerified = true;
+        user.otp = null;
+        user.otpExpires = null;
+        await user.save();
+
+        // Send welcome email
+        await sendWelcomeEmail(user);
+
+        // Remove password from response
+        const userResponse = user.toJSON();
+        delete userResponse.password;
+
+        // Set session
+        req.session.userId = user._id;
+        req.session.user = userResponse;
+        delete req.session.pendingUserId;
+
+        res.json({
+            success: true,
+            message: 'Email verified successfully! Welcome to Servizo!',
+            user: userResponse
+        });
+
+    } catch (error) {
+        console.error('OTP verification error:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Server error during verification'
+        });
+    }
+};
+
+// Resend OTP
+const resendOTP = async (req, res) => {
+    try {
+        const { email } = req.body;
+
+        const user = await User.findOne({ email });
+        
+        if (!user) {
+            return res.status(404).json({
+                success: false,
+                message: 'User not found'
+            });
+        }
+
+        if (user.emailVerified) {
+            return res.status(400).json({
+                success: false,
+                message: 'Email already verified'
+            });
+        }
+
+        // Generate new OTP
+        const otp = generateOTP();
+        const otpExpires = new Date(Date.now() + 10 * 60 * 1000);
+
+        user.otp = otp;
+        user.otpExpires = otpExpires;
+        await user.save();
+
+        // Send OTP email
+        await sendOTPEmail(user, otp);
+
+        res.json({
+            success: true,
+            message: 'New OTP sent to your email'
+        });
+
+    } catch (error) {
+        console.error('Resend OTP error:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Server error'
         });
     }
 };
@@ -94,6 +239,35 @@ const loginUser = async (req, res) => {
             return res.status(401).json({
                 success: false,
                 message: 'Invalid email or password'
+            });
+        }
+
+        // Check if email is verified
+        if (!user.emailVerified) {
+            // Check if OTP already exists and is not expired
+            const hasValidOTP = user.otp && user.otpExpires && new Date() < user.otpExpires;
+            
+            if (!hasValidOTP) {
+                // Generate and send new OTP only if no valid OTP exists
+                const otp = generateOTP();
+                const otpExpires = new Date(Date.now() + 10 * 60 * 1000);
+                
+                user.otp = otp;
+                user.otpExpires = otpExpires;
+                await user.save();
+                
+                await sendOTPEmail(user, otp);
+            }
+            
+            req.session.pendingUserId = user._id;
+            
+            return res.status(403).json({
+                success: false,
+                message: hasValidOTP 
+                    ? 'Email not verified. Please check your email for OTP.' 
+                    : 'Email not verified. OTP sent to your email.',
+                requiresOTP: true,
+                email: user.email
             });
         }
 
@@ -165,6 +339,8 @@ const getCurrentUser = async (req, res) => {
 
 module.exports = {
     registerUser,
+    verifyOTP,
+    resendOTP,
     loginUser,
     logoutUser,
     getCurrentUser

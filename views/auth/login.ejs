@@ -182,14 +182,17 @@ document.getElementById('loginForm').addEventListener('submit', async function(e
         if (data.success) {
             // Redirect to dashboard
             window.location.href = '/dashboard';
+        } else if (data.requiresOTP) {
+            // Email not verified, redirect to OTP page
+            window.location.href = `/auth/verify?email=${encodeURIComponent(data.email)}`;
         } else {
             alert(data.message || 'Login failed');
+            submitBtn.innerHTML = originalText;
+            submitBtn.disabled = false;
         }
     } catch (error) {
         console.error('Login error:', error);
         alert('Network error. Please try again.');
-    } finally {
-        // Reset button
         submitBtn.innerHTML = originalText;
         submitBtn.disabled = false;
     }

@@ -282,18 +282,22 @@ document.getElementById('registerForm').addEventListener('submit', async functio
         
         const data = await response.json();
         
-        if (data.success) {
-            // Redirect to dashboard
+        if (data.success && data.requiresOTP) {
+            // OTP sent, redirect to verification page
+            alert('Registration successful! OTP sent to your email.');
+            window.location.href = `/auth/verify?email=${encodeURIComponent(data.email)}`;
+        } else if (data.success) {
+            // Account created successfully (fallback)
             alert('Account created successfully!');
             window.location.href = '/dashboard';
         } else {
             alert(data.message || 'Registration failed');
+            submitBtn.innerHTML = originalText;
+            submitBtn.disabled = false;
         }
     } catch (error) {
         console.error('Registration error:', error);
         alert('Network error. Please try again.');
-    } finally {
-        // Reset button
         submitBtn.innerHTML = originalText;
         submitBtn.disabled = false;
     }
