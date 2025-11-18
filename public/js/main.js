@@ -296,32 +296,82 @@ function closeModal(modalId) {
 }
 
 // ===== NOTIFICATION SYSTEM =====
-function showNotification(message, type = 'info', duration = 5000) {
-    const notification = document.createElement('div');
-    notification.className = `alert alert-${type} alert-dismissible fade show notification`;
-    notification.innerHTML = `
-        ${message}
-        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-    `;
+function showToast(message, type = 'info', duration = 10000) {
+    const toastEl = document.getElementById('globalToast');
+    if (!toastEl) return;
     
-    // Add styles for notification positioning
-    notification.style.cssText = `
-        position: fixed;
-        top: 100px;
-        right: 20px;
-        z-index: 9999;
-        min-width: 300px;
-        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-    `;
+    const toastBody = toastEl.querySelector('.toast-body');
+    const toastTitle = toastEl.querySelector('.toast-title');
+    const toastIcon = toastEl.querySelector('.toast-icon');
+    const toastHeader = toastEl.querySelector('.toast-header');
     
-    document.body.appendChild(notification);
+    // Set message
+    toastBody.textContent = message;
     
-    // Auto remove notification
-    setTimeout(() => {
-        if (notification.parentNode) {
-            notification.remove();
-        }
-    }, duration);
+    // Set icon and color based on type
+    const iconMap = {
+        success: { icon: 'fa-check-circle', title: 'Success' },
+        error: { icon: 'fa-exclamation-circle', title: 'Error' },
+        warning: { icon: 'fa-exclamation-triangle', title: 'Warning' },
+        info: { icon: 'fa-info-circle', title: 'Info' }
+    };
+    
+    const config = iconMap[type] || iconMap.info;
+    
+    // Clear previous toast type classes
+    toastEl.classList.remove('toast-success', 'toast-error', 'toast-danger', 'toast-warning', 'toast-info');
+    toastHeader.classList.remove('bg-success', 'bg-error', 'bg-danger', 'bg-warning', 'bg-info', 'bg-opacity-10');
+    
+    // Add new toast type class
+    toastEl.classList.add(`toast-${type === 'error' ? 'danger' : type}`);
+    
+    // Update icon (remove color classes as CSS handles it)
+    toastIcon.className = `fas ${config.icon} toast-icon`;
+    
+    // Update title
+    toastTitle.textContent = config.title;
+    
+    // Show toast
+    const toast = new bootstrap.Toast(toastEl, {
+        autohide: true,
+        delay: duration
+    });
+    toast.show();
+}
+
+// Confirmation dialog using Bootstrap modal
+function showConfirm(message, title = 'Confirm Action') {
+    return new Promise((resolve) => {
+        const modal = document.getElementById('confirmModal');
+        const modalTitle = document.getElementById('confirmModalTitle');
+        const modalMessage = document.getElementById('confirmModalMessage');
+        const confirmBtn = document.getElementById('confirmModalBtn');
+        
+        modalTitle.textContent = title;
+        modalMessage.textContent = message;
+        
+        const bsModal = new bootstrap.Modal(modal);
+        
+        // Remove any existing event listeners
+        const newConfirmBtn = confirmBtn.cloneNode(true);
+        confirmBtn.parentNode.replaceChild(newConfirmBtn, confirmBtn);
+        
+        newConfirmBtn.addEventListener('click', () => {
+            bsModal.hide();
+            resolve(true);
+        });
+        
+        modal.addEventListener('hidden.bs.modal', () => {
+            resolve(false);
+        }, { once: true });
+        
+        bsModal.show();
+    });
+}
+
+// Legacy function for backward compatibility
+function showNotification(message, type = 'info', duration = 10000) {
+    showToast(message, type, duration);
 }
 
 // ===== SERVICE BOOKING FUNCTIONS =====
@@ -513,6 +563,8 @@ window.addEventListener('unhandledrejection', function(e) {
 // ===== EXPORT FOR USE IN OTHER FILES =====
 window.ServizoApp = {
     showNotification,
+    showToast,
+    showConfirm,
     bookService,
     viewServiceDetails,
     showLoading,
@@ -536,17 +588,21 @@ async function logoutUser() {
         });
         
         if (response.ok) {
-            // Redirect to home page
-            window.location.href = '/';
+            showToast('Logged out successfully', 'success');
+            setTimeout(() => {
+                window.location.href = '/';
+            }, 1000);
         } else {
             console.error('Logout failed');
-            alert('Error logging out. Please try again.');
+            showToast('Error logging out. Please try again.', 'error');
         }
     } catch (error) {
         console.error('Logout error:', error);
-        alert('Error logging out. Please try again.');
+        showToast('Error logging out. Please try again.', 'error');
     }
 }
 
-// Make logout function globally available
+// Make functions globally available
 window.logoutUser = logoutUser;
+window.showToast = showToast;
+window.showConfirm = showConfirm;

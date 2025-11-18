@@ -30,6 +30,12 @@
                                     </a>
                                 </li>
                                 <li class="nav-item">
+                                    <a class="nav-link" href="#" onclick="event.preventDefault(); showReviewsTab(); return false;">
+                                        <i class="fas fa-star"></i>
+                                        My Reviews
+                                    </a>
+                                </li>
+                                <li class="nav-item">
                                     <a class="nav-link" href="/services">
                                         <i class="fas fa-search"></i>
                                         Find Services
@@ -276,6 +282,22 @@
                         </div>
                     </div>
                 </div>
+
+                <!-- My Reviews Tab -->
+                <div id="reviewsTab" class="row" style="display: none;">
+                    <div class="col-12">
+                        <div class="card">
+                            <div class="card-header bg-primary text-white">
+                                <h5 class="mb-0"><i class="fas fa-star"></i> My Reviews</h5>
+                            </div>
+                            <div class="card-body">
+                                <div id="myReviewsList">
+                                    <!-- Reviews will be loaded here -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -389,7 +411,6 @@ let currentBookingId = null;
 
 // Tab management
 function showDashboardTab() {
-    console.log('showDashboardTab called');
     try {
         // Hide all tabs
         document.getElementById('dashboardTab').style.display = 'block';
@@ -398,7 +419,6 @@ function showDashboardTab() {
         
         // Update navigation
         updateActiveNavLink('dashboard');
-        console.log('showDashboardTab completed');
     } catch (error) {
         console.error('Error in showDashboardTab:', error);
     }
@@ -406,7 +426,6 @@ function showDashboardTab() {
 
 function showBookingsTab() {
     try {
-        console.log('showBookingsTab called');
         
         // Hide all tabs
         const dashboardTab = document.getElementById('dashboardTab');
@@ -421,27 +440,44 @@ function showBookingsTab() {
         updateActiveNavLink('bookings');
         loadBookings();
         setupBookingEventListeners();
-        
-        console.log('showBookingsTab completed');
     } catch (error) {
         console.error('Error in showBookingsTab:', error);
     }
 }
 
 function showMyServicesTab() {
-    console.log('showMyServicesTab called');
     try {
         // Hide all tabs
         document.getElementById('dashboardTab').style.display = 'none';
         document.getElementById('bookingsTab').style.display = 'none';
         document.getElementById('myServicesTab').style.display = 'block';
+        if (document.getElementById('reviewsTab')) {
+            document.getElementById('reviewsTab').style.display = 'none';
+        }
         
         // Update navigation and load services
         updateActiveNavLink('services');
         loadMyServices();
-        console.log('showMyServicesTab completed');
     } catch (error) {
         console.error('Error in showMyServicesTab:', error);
+    }
+}
+
+function showReviewsTab() {
+    try {
+        // Hide all tabs
+        document.getElementById('dashboardTab').style.display = 'none';
+        document.getElementById('bookingsTab').style.display = 'none';
+        if (document.getElementById('myServicesTab')) {
+            document.getElementById('myServicesTab').style.display = 'none';
+        }
+        document.getElementById('reviewsTab').style.display = 'block';
+        
+        // Update navigation and load reviews
+        updateActiveNavLink('reviews');
+        loadMyReviews();
+    } catch (error) {
+        console.error('Error in showReviewsTab:', error);
     }
 }
 
@@ -458,7 +494,7 @@ function updateActiveNavLink(activeTab) {
 // Bookings functionality
 async function loadBookings(status = 'all') {
     try {
-        showLoading();
+        // showLoading();
         
         const params = new URLSearchParams();
         if (status !== 'all') params.append('status', status);
@@ -476,7 +512,7 @@ async function loadBookings(status = 'all') {
         console.error('Error loading bookings:', error);
         showError('Error loading bookings');
     } finally {
-        hideLoading();
+        // hideLoading();
     }
 }
 
@@ -671,14 +707,14 @@ async function updateBookingStatus(bookingId, status) {
         const data = await response.json();
         
         if (data.success) {
-            alert('Booking status updated successfully!');
+            showToast('Booking status updated successfully!', 'success');
             loadBookings();
         } else {
-            alert('Error updating booking: ' + data.message);
+            showToast('Error updating booking: ' + data.message, 'error');
         }
     } catch (error) {
         console.error('Error updating booking:', error);
-        alert('Error updating booking');
+        showToast('Error updating booking', 'error');
     }
 }
 
@@ -698,14 +734,14 @@ async function cancelBooking(bookingId) {
         const data = await response.json();
         
         if (data.success) {
-            alert('Booking cancelled successfully!');
+            showToast('Booking cancelled successfully!', 'success');
             loadBookings();
         } else {
-            alert('Error cancelling booking: ' + data.message);
+            showToast('Error cancelling booking: ' + data.message, 'error');
         }
     } catch (error) {
         console.error('Error cancelling booking:', error);
-        alert('Error cancelling booking');
+        showToast('Error cancelling booking', 'error');
     }
 }
 
@@ -745,12 +781,10 @@ function showCreateServiceModal() {
 
 async function loadMyServices() {
     try {
-        console.log('Loading my services...');
         const response = await fetch('/services/provider/my');
         const data = await response.json();
         
         if (data.success) {
-            console.log('Services loaded:', data.services);
             displayServices(data.services);
         } else {
             console.error('Error loading services:', data.message);
@@ -763,13 +797,11 @@ async function loadMyServices() {
 }
 
 function displayServices(services) {
-    console.log('displayServices called with:', services);
     // Try to get the services list element - check both possible IDs
     let servicesList = document.getElementById('myServicesTabList');
     if (!servicesList) {
         servicesList = document.getElementById('servicesList');
     }
-    console.log('servicesList element:', servicesList);
     
     if (!servicesList) {
         console.error('Services list element not found!');
@@ -777,7 +809,6 @@ function displayServices(services) {
     }
     
     if (services.length === 0) {
-        console.log('No services to display');
         servicesList.innerHTML = `
             <div class="col-12">
                 <div class="text-center py-4">
@@ -792,8 +823,7 @@ function displayServices(services) {
         `;
         return;
     }
-    
-    console.log('Displaying', services.length, 'services');
+
     servicesList.innerHTML = services.map(service => `
         <div class="col-md-6 col-lg-4 mb-4">
             <div class="card service-card">
@@ -893,19 +923,19 @@ async function toggleServiceStatus(serviceId) {
         const data = await response.json();
         
         if (data.success) {
-            alert(data.message);
+            showToast(data.message, 'success');
             loadMyServices(); // Reload services
         } else {
-            alert('Error updating service: ' + data.message);
+            showToast('Error updating service: ' + data.message, 'error');
         }
     } catch (error) {
         console.error('Error updating service:', error);
-        alert('Error updating service');
+        showToast('Error updating service', 'error');
     }
 }
 
 async function deleteService(serviceId) {
-    if (!confirm('Are you sure you want to delete this service? This action cannot be undone.')) {
+    if (!await showConfirm('Are you sure you want to delete this service? This action cannot be undone.', 'Delete Service')) {
         return;
     }
     
@@ -920,20 +950,122 @@ async function deleteService(serviceId) {
         const data = await response.json();
         
         if (data.success) {
-            alert('Service deleted successfully!');
+            showToast('Service deleted successfully!', 'success');
             loadMyServices(); // Reload services
         } else {
-            alert('Error deleting service: ' + data.message);
+            showToast('Error deleting service: ' + data.message, 'error');
         }
     } catch (error) {
         console.error('Error deleting service:', error);
-        alert('Error deleting service');
+        showToast('Error deleting service', 'error');
     }
 }
 
 function editService(serviceId) {
     // TODO: Implement edit functionality
-    alert('Edit functionality coming soon!');
+    showToast('Edit functionality coming soon!', 'info');
+}
+
+// Reviews functionality
+async function loadMyReviews() {
+    const reviewsList = document.getElementById('myReviewsList');
+    reviewsList.innerHTML = '';
+
+    try {
+        const response = await fetch('/reviews/user');
+        const data = await response.json();
+
+        if (!data.success) {
+            throw new Error(data.message);
+        }
+
+        if (data.reviews.length === 0) {
+            reviewsList.innerHTML = `
+                <div class="text-center py-5">
+                    <i class="fas fa-comment-slash display-1 text-muted"></i>
+                    <p class="text-muted mt-3">You haven't written any reviews yet.</p>
+                    <a href="/services" class="btn btn-primary">Browse Services</a>
+                </div>
+            `;
+            return;
+        }
+
+        reviewsList.innerHTML = data.reviews.map(review => `
+            <div class="card mb-3">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <h6 class="mb-1">
+                                <a href="/services/${review.serviceId._id}">${review.serviceId.title}</a>
+                            </h6>
+                            <div class="mb-2">
+                                ${generateReviewStars(review.rating)}
+                            </div>
+                            <small class="text-muted">
+                                <i class="far fa-calendar"></i> ${new Date(review.createdAt).toLocaleDateString()}
+                                ${review.isVerified ? '<span class="badge bg-success ms-2"><i class="fas fa-check-circle"></i> Verified</span>' : ''}
+                            </small>
+                        </div>
+                        <div>
+                            <button class="btn btn-sm btn-outline-danger" onclick="deleteMyReview('${review._id}')">
+                                <i class="fas fa-trash"></i> Delete
+                            </button>
+                        </div>
+                    </div>
+                    <p class="mt-3">${review.comment}</p>
+                    
+                    <div class="text-muted small">
+                        <i class="fas fa-thumbs-up"></i> ${review.helpful || 0} helpful
+                        <span class="ms-3"><i class="fas fa-thumbs-down"></i> ${review.notHelpful || 0} not helpful</span>
+                    </div>
+                    
+                    ${review.providerResponse?.comment ? `
+                        <div class="alert alert-info mt-3">
+                            <strong><i class="fas fa-reply"></i> Provider Response:</strong>
+                            <p class="mb-0 mt-2">${review.providerResponse.comment}</p>
+                            <small class="text-muted">${new Date(review.providerResponse.respondedAt).toLocaleDateString()}</small>
+                        </div>
+                    ` : ''}
+                </div>
+            </div>
+        `).join('');
+
+    } catch (error) {
+        reviewsList.innerHTML = `
+            <div class="alert alert-danger">
+                <i class="fas fa-exclamation-triangle"></i> Error loading reviews: ${error.message}
+            </div>
+        `;
+    }
+}
+
+function generateReviewStars(rating) {
+    let stars = '';
+    for (let i = 1; i <= 5; i++) {
+        stars += `<i class="fas fa-star ${i <= rating ? 'text-warning' : 'text-muted'}"></i>`;
+    }
+    return stars;
+}
+
+async function deleteMyReview(reviewId) {
+    if (!await showConfirm('Are you sure you want to delete this review?', 'Delete Review')) return;
+
+    try {
+        const response = await fetch(`/reviews/${reviewId}`, {
+            method: 'DELETE'
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+            loadMyReviews();
+            showToast('Review deleted successfully!', 'success');
+        } else {
+            showToast(data.message, 'error');
+        }
+    } catch (error) {
+        showToast('Error deleting review: ' + error.message, 'error');
+    }
 }
 
 async function logout() {
@@ -948,11 +1080,11 @@ async function logout() {
         if (response.ok) {
             window.location.href = '/';
         } else {
-            alert('Error logging out');
+            showToast('Error logging out', 'error');
         }
     } catch (error) {
         console.error('Logout error:', error);
-        alert('Error logging out');
+        showToast('Error logging out', 'error');
     }
 }
 </script>

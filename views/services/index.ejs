@@ -320,10 +320,11 @@ function applyRecentSearch(query, city) {
     searchServices();
 }
 
-function clearRecentSearches() {
-    if (confirm('Clear all recent searches?')) {
+async function clearRecentSearches() {
+    if (await showConfirm('Clear all recent searches?', 'Clear Recent Searches')) {
         localStorage.removeItem(STORAGE_KEYS.RECENT_SEARCHES);
         displayRecentSearches();
+        showToast('Recent searches cleared', 'success');
     }
 }
 
@@ -442,10 +443,11 @@ function displayRecentlyViewed(services) {
     `).join('');
 }
 
-function clearRecentlyViewed() {
-    if (confirm('Clear recently viewed services?')) {
+async function clearRecentlyViewed() {
+    if (await showConfirm('Clear recently viewed services?', 'Clear Recently Viewed')) {
         localStorage.removeItem(STORAGE_KEYS.RECENTLY_VIEWED);
         document.getElementById('recentlyViewedSection').style.display = 'none';
+        showToast('Recently viewed services cleared', 'success');
     }
 }
 
@@ -508,7 +510,7 @@ function displayServices(services) {
                     
                     <div class="service-provider mb-2">
                         <i class="fas fa-user-circle"></i>
-                        <span>${service.provider?.fullName || 'Unknown Provider'}</span>
+                        <span>${(service.provider?.firstName || '') + ' ' + (service.provider?.lastName || '') || 'Service Provider'}</span>
                     </div>
                     
                     <div class="service-location mb-2">
@@ -707,7 +709,7 @@ function hideLoading() {
 }
 
 function showError(message) {
-    alert(message); // TODO: Implement proper error display
+    showToast(message, 'error');
 }
 
 function debounce(func, wait) {

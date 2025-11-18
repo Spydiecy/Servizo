@@ -110,15 +110,10 @@ document.addEventListener('DOMContentLoaded', function() {
         this.value = this.value.replace(/[^0-9]/g, '');
     });
 
-    // Show alert
+    // Show alert (using toast notifications)
     function showAlert(message, type = 'danger') {
-        alertContainer.innerHTML = `
-            <div class="alert alert-${type} alert-dismissible fade show" role="alert">
-                <i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'} me-2"></i>
-                ${message}
-                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-            </div>
-        `;
+        const toastType = type === 'danger' ? 'error' : type;
+        showToast(message, toastType);
     }
 
     // Verify OTP

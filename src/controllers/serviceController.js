@@ -146,7 +146,7 @@ const getAllServices = async (req, res) => {
 
         // Get services with provider info
         const services = await Service.find(filter)
-            .populate('provider', 'fullName email phone rating')
+            .populate('provider', 'firstName lastName email phone rating')
             .sort(sort)
             .skip(skip)
             .limit(parseInt(limit));
@@ -215,7 +215,7 @@ const getProviderServices = async (req, res) => {
 const getServiceById = async (req, res) => {
     try {
         const service = await Service.findById(req.params.id)
-            .populate('provider', 'fullName email phone rating profileImage');
+            .populate('provider', 'firstName lastName email phone rating profileImage');
 
         if (!service) {
             return res.status(404).json({
