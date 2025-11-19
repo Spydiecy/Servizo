@@ -58,6 +58,7 @@ const initializeApp = async () => {
         app.use('/services', require('./routes/services'));
         app.use('/bookings', require('./routes/bookings'));
         app.use('/reviews', require('./routes/reviews'));
+        app.use('/', require('./routes/recommendations'));
 
         // Homepage
         app.get('/', (req, res) => {

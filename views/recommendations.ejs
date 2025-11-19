@@ -1,0 +1,144 @@
+<div class="container mt-5 pt-5">
+    <div class="recommendations-section py-5">
+        <div class="page-header mb-5">
+            <div class="row align-items-center">
+                <div class="col-md-8">
+                    <h1 class="display-5 fw-bold mb-2">Recommended for You</h1>
+                    <p class="text-muted mb-0">Personalized service suggestions based on your booking history and preferences</p>
+                </div>
+                <div class="col-md-4 text-md-end">
+                    <a href="/services" class="btn btn-outline-primary">
+                        <i class="fas fa-th-large me-2"></i>Browse All Services
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <% if (recommendations && recommendations.length > 0) { %>
+            <div class="row g-4">
+                <% recommendations.forEach(service => { %>
+                    <div class="col-md-6 col-lg-4">
+                        <div class="card h-100 border-0 shadow-sm hover-card">
+                            <div class="card-body p-4">
+
+                                <div class="d-flex justify-content-between align-items-start mb-3">
+                                    <div>
+                                        <h5 class="card-title fw-bold mb-2"><%= service.title %></h5>
+                                        <span class="badge bg-primary bg-opacity-10 text-primary">
+                                            <i class="fas fa-tag me-1"></i><%= service.category.charAt(0).toUpperCase() + service.category.slice(1) %>
+                                        </span>
+                                    </div>
+                                </div>
+
+                                <p class="card-text text-muted mb-3" style="font-size: 0.95rem; line-height: 1.6;">
+                                    <%= service.description.length > 120 ? service.description.substring(0, 120) + '...' : service.description %>
+                                </p>
+
+                                <% if (service.recommendationReasons && service.recommendationReasons.length > 0) { %>
+                                    <div class="recommendation-info mb-3">
+                                        <p class="small text-muted mb-2">
+                                            <i class="fas fa-lightbulb text-warning me-1"></i>
+                                            <%= service.recommendationReasons[0] %>
+                                        </p>
+                                    </div>
+                                <% } %>
+
+                                <div class="d-flex align-items-center justify-content-between mb-3">
+                                    <div>
+                                        <div class="h4 text-success mb-0 fw-bold">₹<%= service.price %></div>
+                                        <small class="text-muted"><%= service.priceType === 'hourly' ? '/hour' : service.priceType === 'per-visit' ? '/visit' : '' %></small>
+                                    </div>
+                                    <% if (service.rating && service.rating.count > 0) { %>
+                                        <div class="text-end">
+                                            <div class="text-warning">
+                                                <i class="fas fa-star"></i>
+                                                <span class="fw-semibold"><%= service.rating.average.toFixed(1) %></span>
+                                            </div>
+                                            <small class="text-muted"><%= service.rating.count %> reviews</small>
+                                        </div>
+                                    <% } %>
+                                </div>
+
+                                <% if (service.provider) { %>
+                                    <div class="provider-info border-top pt-3 mb-3">
+                                        <div class="d-flex align-items-center">
+                                            <div class="avatar-circle bg-primary bg-opacity-10 text-primary me-2">
+                                                <%= service.provider.firstName.charAt(0).toUpperCase() %>
+                                            </div>
+                                            <div class="flex-grow-1">
+                                                <div class="fw-semibold small"><%= service.provider.firstName %> <%= service.provider.lastName %></div>
+                                                <div class="text-muted" style="font-size: 0.85rem;">
+                                                    <i class="fas fa-map-marker-alt me-1"></i>
+                                                    <%= service.provider.address?.city || service.serviceArea?.city || 'Available' %>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                <% } %>
+
+                                <a href="/services/<%= service._id %>" class="btn btn-primary w-100">
+                                    View Details <i class="fas fa-arrow-right ms-2"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                <% }); %>
+            </div>
+        <% } else { %>
+            <div class="text-center py-5">
+                <div class="mb-4">
+                    <i class="fas fa-search fa-5x text-muted"></i>
+                </div>
+                <h3 class="mb-3">No Recommendations Yet</h3>
+                <p class="text-muted mb-4">Start booking services to get personalized recommendations!</p>
+                <a href="/services" class="btn btn-primary btn-lg">
+                    <i class="fas fa-th-large me-2"></i>Browse All Services
+                </a>
+            </div>
+        <% } %>
+    </div>
+</div>
+
+<style>
+    .recommendations-section {
+        min-height: 60vh;
+    }
+
+    .hover-card {
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+        border-radius: 12px;
+    }
+
+    .hover-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 8px 24px rgba(0,0,0,0.12) !important;
+    }
+
+    .avatar-circle {
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 600;
+        font-size: 1rem;
+    }
+
+    .recommendation-info {
+        background: #f8f9fa;
+        border-left: 3px solid #0d6efd;
+        padding: 8px 12px;
+        border-radius: 4px;
+    }
+
+    .card-title {
+        color: #1a1a1a;
+        font-size: 1.1rem;
+    }
+
+    .badge {
+        font-weight: 500;
+        padding: 0.4rem 0.75rem;
+    }
+</style>

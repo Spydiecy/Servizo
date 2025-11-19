@@ -40,6 +40,11 @@
                     <li class="nav-item">
                         <a class="nav-link" href="/contact">Contact</a>
                     </li>
+                    <% if (typeof user !== 'undefined' && user && user.userType === 'customer') { %>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/recommendations">🎯 For You</a>
+                    </li>
+                    <% } %>
                 </ul>
                 
                 <!-- User Authentication -->
