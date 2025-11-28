@@ -18,23 +18,28 @@ const initializeSocket = (server) => {
 
         // Handle user joining
         socket.on('user_join', (userData) => {
+            const userName = typeof userData === 'string' ? userData : (userData.name || 'Guest');
+            const userId = typeof userData === 'object' ? userData.userId : null;
+            
             users.set(socket.id, {
                 id: socket.id,
-                name: userData.name || 'Guest',
-                userId: userData.userId || null,
+                name: userName,
+                userId: userId,
                 joinedAt: new Date()
             });
 
             // Notify all users about the updated user list
-            io.emit('user_list', Array.from(users.values()));
+            const userList = Array.from(users.values());
+            io.emit('user_list', userList);
             
             // Notify all users that someone joined
             io.emit('user_joined', {
                 userId: socket.id,
-                userName: userData.name || 'Guest'
+                userName: userName,
+                count: userList.length
             });
             
-            console.log(`✅ ${userData.name} joined the chat`);
+            console.log(`✅ ${userName} joined the chat (Total: ${userList.length})`);
         });
 
         // Handle chat message
@@ -71,17 +76,19 @@ const initializeSocket = (server) => {
             users.delete(socket.id);
             
             // Notify all users about the updated user list
-            io.emit('user_list', Array.from(users.values()));
+            const userList = Array.from(users.values());
+            io.emit('user_list', userList);
             
             // Notify all users that someone left
             if (user) {
                 io.emit('user_left', {
                     userId: socket.id,
-                    userName: user.name
+                    userName: user.name,
+                    count: userList.length
                 });
             }
             
-            console.log(`👋 ${user?.name || 'User'} disconnected`);
+            console.log(`👋 ${user?.name || 'User'} disconnected (Total: ${userList.length})`);
         });
     });
 
