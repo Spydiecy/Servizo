@@ -8,8 +8,15 @@
     "start": "node src/app.js",
     "dev": "nodemon src/app.js",
     "test": "jest --passWithNoTests",
+    "test:unit": "jest __tests__/services.test.js",
+    "test:integration": "jest __tests__/integration --runInBand",
+    "test:integration:auth": "jest __tests__/integration/auth.integration.test.js",
+    "test:integration:booking": "jest __tests__/integration/booking.integration.test.js",
+    "test:integration:service": "jest __tests__/integration/service.integration.test.js",
+    "test:integration:review": "jest __tests__/integration/review.integration.test.js",
+    "test:all": "jest --runInBand",
     "test:watch": "jest --watch",
-    "test:coverage": "jest --coverage"
+    "test:coverage": "jest --coverage --runInBand"
   },
   "keywords": [
     "service",
