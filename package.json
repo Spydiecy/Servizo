@@ -4,7 +4,6 @@
   "description": "A comprehensive service booking platform for home services",
   "main": "src/app.js",
   "scripts": {
-    "prestart": "npm test",
     "start": "node src/app.js",
     "dev": "nodemon src/app.js",
     "test": "jest --passWithNoTests",
