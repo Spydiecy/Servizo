@@ -23,7 +23,10 @@ const registerUser = async (req, res) => {
                     existingUser.otpExpires = otpExpires;
                     await existingUser.save();
                     
-                    await sendOTPEmail(existingUser, otp);
+                    // Send OTP email (non-blocking)
+                    sendOTPEmail(existingUser, otp).catch(err => {
+                        console.error('❌ Failed to send OTP email:', err.message);
+                    });
                 }
                 
                 req.session.pendingUserId = existingUser._id;
@@ -63,8 +66,10 @@ const registerUser = async (req, res) => {
 
         await user.save();
 
-        // Send OTP email
-        await sendOTPEmail(user, otp);
+        // Send OTP email (non-blocking)
+        sendOTPEmail(user, otp).catch(err => {
+            console.error('❌ Failed to send OTP email:', err.message);
+        });
 
         // Store user ID in session for OTP verification
         req.session.pendingUserId = user._id;
@@ -138,8 +143,10 @@ const verifyOTP = async (req, res) => {
         user.otpExpires = null;
         await user.save();
 
-        // Send welcome email
-        await sendWelcomeEmail(user);
+        // Send welcome email (non-blocking)
+        sendWelcomeEmail(user).catch(err => {
+            console.error('❌ Failed to send welcome email:', err.message);
+        });
 
         // Remove password from response
         const userResponse = user.toJSON();
