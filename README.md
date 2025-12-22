@@ -149,6 +149,42 @@ servizo/
 6. **Access the application**
    Open your browser and navigate to `http://localhost:3000`
 
+## 🌐 Deployment
+
+Want to deploy your app online for free?
+
+**Quick Start:**
+1. Read the complete [Deployment Guide](DEPLOYMENT.md)
+2. Setup MongoDB Atlas (free)
+3. Deploy to Render (free)
+4. Your app will be live in 10 minutes!
+
+**Tools Used:**
+- **Hosting:** Render (Free tier)
+- **Database:** MongoDB Atlas (Free tier)
+- **Caching:** Redis Cloud (Free tier - optional)
+
+See [DEPLOYMENT.md](DEPLOYMENT.md) for step-by-step instructions.
+
+## 🧪 Testing
+
+**Run all tests:**
+```bash
+npm test
+```
+
+**Run integration tests:**
+```bash
+npm run test:integration
+```
+
+**Generate coverage report:**
+```bash
+npm run test:coverage
+```
+
+See [TESTING.md](TESTING.md) for complete testing documentation.
+
 ## 📱 Application Flow
 
 ### For Customers
